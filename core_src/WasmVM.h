@@ -7,37 +7,35 @@
 
 #include "XP_API.h"
 
-
-
 using namespace wasmtime;
 
-
-class WasmVM {
+class WasmVM
+{
 public:
-    explicit WasmVM( std::string &filename ) {
-        
+	explicit WasmVM(std::string &filename)
+	{
+
 		wasmtime::Config config;
-        config.consume_fuel(true);
-        config.debug_info(true); // Enable DWARF debug info for better stack traces
-        config.wasm_threads(true); // Enable support for wasm threads (atomics)
-        config.wasm_simd(true); // Enable SIMD instructions
-        config.wasm_bulk_memory(true); // Enable bulk memory operations
-        config.wasm_multi_value(true); // Enable multi-value returns
-        config.wasm_reference_types(true); // Enable reference types (externref, funcref)
-        //config.cranelift_opt_level(wasmtime::OptLevel::Speed); // Set Cranelift optimization level (0-3)
-        //config.strategy(wasmtime::Strategy::Cranelift); // Choose compilation strategy
-        //config.profiler(wasmtime::ProfilingStrategy::Jitdump); // Enable JIT profiling
-        //config.epoch_interruption(true); // Enable epoch-based interruption
-        //config.static_memory_maximum_size(128 * 1024 * 1024); // Set static memory max size
-        //config.static_memory_guard_size(2 * 1024 * 1024); // Guard region for static memory
-        //config.dynamic_memory_guard_size(2 * 1024 * 1024); // Guard region for dynamic memory
-        
+		config.consume_fuel(true);
+		config.debug_info(true);		   // Enable DWARF debug info for better stack traces
+		config.wasm_threads(true);		   // Enable support for wasm threads (atomics)
+		config.wasm_simd(true);			   // Enable SIMD instructions
+		config.wasm_bulk_memory(true);	   // Enable bulk memory operations
+		config.wasm_multi_value(true);	   // Enable multi-value returns
+		config.wasm_reference_types(true); // Enable reference types (externref, funcref)
+										   // config.cranelift_opt_level(wasmtime::OptLevel::Speed); // Set Cranelift optimization level (0-3)
+		// config.strategy(wasmtime::Strategy::Cranelift); // Choose compilation strategy
+		// config.profiler(wasmtime::ProfilingStrategy::Jitdump); // Enable JIT profiling
+		// config.epoch_interruption(true); // Enable epoch-based interruption
+		// config.static_memory_maximum_size(128 * 1024 * 1024); // Set static memory max size
+		// config.static_memory_guard_size(2 * 1024 * 1024); // Guard region for static memory
+		// config.dynamic_memory_guard_size(2 * 1024 * 1024); // Guard region for dynamic memory
+
 		wasmtime::Engine engine(std::move(config));
 
-        m_store = new wasmtime::Store(engine);
+		m_store = new wasmtime::Store(engine);
 
-
-		std::cout<<"Init WASI\n";
+		std::cout << "Init WASI\n";
 		WasiConfig wasi;
 		wasi.inherit_argv();
 		wasi.inherit_env();
@@ -46,31 +44,25 @@ public:
 		wasi.inherit_stderr();
 		m_store->context().set_wasi(std::move(wasi)).unwrap();
 
-    	// Instantiate the module
-    	wasmtime::Linker linker(engine);
-		//try{
-    	    linker.define_wasi().unwrap();
+		// Instantiate the module
+		wasmtime::Linker linker(engine);
+		// try{
+		linker.define_wasi().unwrap();
 		//}
 
-
 		// add our custom host API into the wasm mix.
-		XP_API::init( linker, m_store );
-
+		XP_API::init(linker, m_store);
 
 		// Load the WASM module
-		std::vector<uint8_t> wasm_bytes = this->read_file( filename );
-
+		std::vector<uint8_t> wasm_bytes = this->read_file(filename);
 
 		// Compile and instantiate the module
 		std::cout << "Compiling user WASM\n";
 		auto module = wasmtime::Module::compile(engine, wasm_bytes).unwrap();
-	//    if (!module) {
-	//        std::cerr << "Failed to create module" << std::endl;
-	//        return 1;
-	//    }
-
-
-
+		//    if (!module) {
+		//        std::cerr << "Failed to create module" << std::endl;
+		//        return 1;
+		//    }
 
 		// This is for host managed memory pooling which seems to be the exception.
 
@@ -87,24 +79,21 @@ public:
 		// // No extra options are needed unless you want to override the module's memory definition.
 		//     auto& memory = custom_mem;
 
-
-
-		
 		std::cout << "Attempting to instantiate user WASM\n";
 		m_instance = new wasmtime::Instance(linker.instantiate(m_store, module).unwrap());
-	//    if (!instance) {
-	//        std::cerr << "Failed to instantiate module" << std::endl;
-	//        auto error = instance.err();
-	//        std::cerr << "Error message: " << error.message() << std::endl;
-	//        return 1;
-	//    }
+		//    if (!instance) {
+		//        std::cerr << "Failed to instantiate module" << std::endl;
+		//        auto error = instance.err();
+		//        std::cerr << "Error message: " << error.message() << std::endl;
+		//        return 1;
+		//    }
 		std::cout << "  Success\n";
-
 
 		std::cout << "Finding WASM memory export..\n";
 		// Extract the memory from the instance
-		auto memor = m_instance->get(m_store, "memory"); //FIXME: ptr deref?
-		if( ! memor ){
+		auto memor = m_instance->get(m_store, "memory"); // FIXME: ptr deref?
+		if (!memor)
+		{
 			throw std::runtime_error("Failed to find 'memory' resource");
 		}
 		m_memory = std::get<Memory>(*memor);
@@ -114,67 +103,58 @@ public:
 		auto mem_size_kb = (mem_size_pages * 64);
 		std::cout << "        size now (kilobytes): " << mem_size_kb << " KB\n";
 
-
 		// find plugin_start,stop,enable,etc
 		this->bind_wasm_exports();
-		
-		
-		this->set_fuel( m_fuel );
 
+		this->set_fuel(m_fuel);
 
-    } //ctor
+	} // ctor
 
-
-	~WasmVM(){
+	~WasmVM()
+	{
 		delete m_instance;
 		delete m_store;
-	} //dtor
+	} // dtor
 
-
-
-
-	void bind_wasm_exports(){
+	void bind_wasm_exports()
+	{
 		std::cout << "Finding WASM fn exports..\n";
 
-		auto find_and_save_func = [&](std::optional<wasmtime::Func>& save_to, const std::string& fn_name) {
+		auto find_and_save_func = [&](std::optional<wasmtime::Func> &save_to, const std::string &fn_name)
+		{
 			auto maybe_export = m_instance->get(m_store, fn_name.c_str());
-			if (maybe_export && std::holds_alternative<Func>(*maybe_export)) {
+			if (maybe_export && std::holds_alternative<Func>(*maybe_export))
+			{
 				save_to = std::get<Func>(*maybe_export);
-			} else {
+			}
+			else
+			{
 				std::cout << " * Warning: " << fn_name << " not found.\n";
 			}
 		};
-
 
 		// examine module exports and get handles to fns we need.
 		// - malloc / free from wasm module for memory interop.
 		find_and_save_func(m_wfn_malloc, "malloc");
 		find_and_save_func(m_wfn_free, "free");
 
-
-		//plugin standard set
+		// plugin standard set
 		find_and_save_func(m_wfn_plugin_start, "plugin_start");
 		find_and_save_func(m_wfn_plugin_stop, "plugin_stop");
 		find_and_save_func(m_wfn_plugin_enable, "plugin_enable");
 		find_and_save_func(m_wfn_plugin_disable, "plugin_disable");
 		find_and_save_func(m_wfn_plugin_message, "plugin_message");
 
-
 		// - plugin_update() ?
 		// - plugin_flightloop()
 		// - plugin_draw() - should we add a bunch specifically for avionics?
-
 	}
 
-
-
-
-
-	int call_plugin_start(){
+	int call_plugin_start()
+	{
 		// plugin start takes 3 char buffers
-		this->set_fuel( m_fuel );
+		this->set_fuel(m_fuel);
 
-		
 		// Write strings to WebAssembly memory
 		int32_t ptr_a = wasm_malloc(256);
 		// wasm_strcpy_to( ptr_a, "WASM default name" );
@@ -185,128 +165,106 @@ public:
 		int32_t ptr_c = wasm_malloc(256);
 		// wasm_strcpy_to( ptr_c, "WASM default description" );
 
-
 		// Call the function with pointers to the strings
 		std::vector<wasmtime::Val> args = {
-				wasmtime::Val(ptr_a),
-				wasmtime::Val(ptr_b),
-				wasmtime::Val(ptr_c)
-		};
-
+			wasmtime::Val(ptr_a),
+			wasmtime::Val(ptr_b),
+			wasmtime::Val(ptr_c)};
 
 		std::cout << "\n> host/ calling plugin_start(a,b,c)\n";
-		auto result = m_wfn_plugin_start.value().call( m_store, args ).unwrap();
+		auto result = m_wfn_plugin_start.value().call(m_store, args).unwrap();
 
 		int ret = 0;
 		{
-			//fflush( stdout );
-			//std::cout << "> host/plugin_start returned, result count: " << result.size() << "\n";
+			// fflush( stdout );
+			// std::cout << "> host/plugin_start returned, result count: " << result.size() << "\n";
 			std::cout << "> host/ plugin_start returned: " << result[0].i32() << std::endl;
 			ret = result[0].i32();
 		}
 
-		
-		if( ret ){
-			wasm_strcpy_from( outName, ptr_a );
+		if (ret)
+		{
+			wasm_strcpy_from(outName, ptr_a);
 			std::cout << "  outName: [" << outName << "]\n";
-			wasm_strcpy_from( outSig, ptr_b );
+			wasm_strcpy_from(outSig, ptr_b);
 			std::cout << "   outSig: [" << outSig << "]\n";
-			wasm_strcpy_from( outDesc, ptr_c );
-			std::cout << "  outDesc: [" << outDesc << "]\n";			
-		}else{
+			wasm_strcpy_from(outDesc, ptr_c);
+			std::cout << "  outDesc: [" << outDesc << "]\n";
+		}
+		else
+		{
 			std::cout << "> host/ WASM module refused to start.\n";
 		}
 
-
 		// MUST free resources - these calls count twd fuel usage!
-		wasm_free( ptr_a );
-		wasm_free( ptr_b );
-		wasm_free( ptr_c );
-
+		wasm_free(ptr_a);
+		wasm_free(ptr_b);
+		wasm_free(ptr_c);
 
 		// DEBUG: Testing use-after-free behaviour. WASM does not clear up old buffers. Data can be leaked.
 		{
 			char read_back[4096];
 			std::cout << "  Use after free test. b and c only.\n";
 			// Attempt to write to ptr_a after it has been freed
-			wasm_strcpy_from( read_back, ptr_b );
+			wasm_strcpy_from(read_back, ptr_b);
 			std::cout << "    ptr_b readback: [" << read_back << "]\n";
-			wasm_strcpy_from( read_back, ptr_c );
+			wasm_strcpy_from(read_back, ptr_c);
 			std::cout << "    ptr_c readback: [" << read_back << "]\n";
 		}
-
 
 		this->check_fuel();
 
 		return ret;
-
 	}
 
-
-	void call_plugin_stop(){
+	void call_plugin_stop()
+	{
 
 		std::cout << "\n> host/call: plugin_stop\n";
-		auto result = m_wfn_plugin_stop.value().call( m_store, {} ).unwrap();
+		auto result = m_wfn_plugin_stop.value().call(m_store, {}).unwrap();
 		this->check_fuel();
-
 	}
 
-
-
-
-	int call_plugin_enable(){
+	int call_plugin_enable()
+	{
 
 		std::cout << "\n> host/call: plugin_enable\n";
-		auto result = m_wfn_plugin_enable.value().call( m_store, {} ).unwrap();
+		auto result = m_wfn_plugin_enable.value().call(m_store, {}).unwrap();
 		this->check_fuel();
 
 		return 1;
-
 	}
 
-
-
-	void call_plugin_disable(){
+	void call_plugin_disable()
+	{
 
 		std::cout << "\n> host/call: plugin_disable\n";
-		auto result = m_wfn_plugin_disable.value().call( m_store, {} ).unwrap();
+		auto result = m_wfn_plugin_disable.value().call(m_store, {}).unwrap();
 		this->check_fuel();
-
 	}
 
+	void call_plugin_message(int64_t inFromWho, int64_t inMessage, int32_t inParam)
+	{
 
-
-
-
-
-
-
-	void call_plugin_message( int64_t inFromWho, int64_t inMessage, int32_t inParam ){
-
-		//std::cout << "\n> host/call: plugin_message\n";
-		std::vector<wasmtime::Val> args = { 
+		// std::cout << "\n> host/call: plugin_message\n";
+		std::vector<wasmtime::Val> args = {
 			wasmtime::Val(inFromWho),
 			wasmtime::Val(inMessage),
-			wasmtime::Val(inParam)
-		};
+			wasmtime::Val(inParam)};
 		auto result = m_wfn_plugin_message.value().call(m_store, args).unwrap();
-		//this->check_fuel();
-
+		// this->check_fuel();
 	}
-
-
-
-
-	
 
 	// fn pair to control WASM compute fuel limits.
-	void set_fuel( size_t f ){
-		m_store->context().set_fuel( f ).unwrap();
+	void set_fuel(size_t f)
+	{
+		m_store->context().set_fuel(f).unwrap();
 	}
 
-	size_t check_fuel(){
-	 	size_t fuel_level = m_store->context().get_fuel().unwrap();
-		
+	size_t check_fuel()
+	{
+		size_t fuel_level = m_store->context().get_fuel().unwrap();
+
 		{
 			uint64_t consumed = m_fuel - fuel_level;
 			std::cout << "  consumed fuel: " << consumed << "\n";
@@ -317,67 +275,63 @@ public:
 		return fuel_level;
 	}
 
-    
-
 private:
 	wasmtime::Store *m_store;
-	wasmtime::Instance* m_instance;
+	wasmtime::Instance *m_instance;
 	std::optional<wasmtime::Memory> m_memory;
-	
+
 	size_t m_fuel = 250'000;
 
 	std::optional<wasmtime::Func> m_wfn_malloc;
 	std::optional<wasmtime::Func> m_wfn_free;
-	
+
 	std::optional<wasmtime::Func> m_wfn_plugin_start;
 	std::optional<wasmtime::Func> m_wfn_plugin_stop;
 	std::optional<wasmtime::Func> m_wfn_plugin_enable;
 	std::optional<wasmtime::Func> m_wfn_plugin_disable;
 	std::optional<wasmtime::Func> m_wfn_plugin_message;
-	
 
 	char outName[256]{};
 	char outSig[256]{};
 	char outDesc[256]{};
-	
 
-
-    std::vector<uint8_t> read_file(const std::string& filename) {
+	std::vector<uint8_t> read_file(const std::string &filename)
+	{
 
 		// Load the WASM module
 		std::ifstream wasm_file(filename.c_str(), std::ios::binary);
-		if (!wasm_file) {
+		if (!wasm_file)
+		{
 			std::cerr << "Failed to open WASM file [" << filename << "]" << std::endl;
-			//return 1;
+			// return 1;
 			throw std::runtime_error("Failed to open WASM file [" + filename + "]");
 		}
 
 		std::vector<uint8_t> wasm_bytes((std::istreambuf_iterator<char>(wasm_file)), std::istreambuf_iterator<char>());
-		if (wasm_bytes.empty()) {
+		if (wasm_bytes.empty())
+		{
 			std::cerr << "Failed to read WASM file" << std::endl;
-			//return 1;
+			// return 1;
 			throw std::runtime_error("Failed to read WASM file [" + filename + "]");
 		}
 
 		return wasm_bytes;
+	}
 
-    }
-
-
-
-
-	int32_t wasm_malloc(int32_t size) {
-		//std::cout << "wasm_malloc called with size: " << size << std::endl;
-		if (!m_wfn_malloc.has_value()) {
+	int32_t wasm_malloc(int32_t size)
+	{
+		// std::cout << "wasm_malloc called with size: " << size << std::endl;
+		if (!m_wfn_malloc.has_value())
+		{
 			throw std::runtime_error("wasm_malloc: malloc function not found in WASM module");
 		}
-		std::vector<wasmtime::Val> args = { wasmtime::Val(size) };
+		std::vector<wasmtime::Val> args = {wasmtime::Val(size)};
 		auto result = m_wfn_malloc.value().call(m_store, args).unwrap();
-		if (result.empty()) {
+		if (result.empty())
+		{
 			throw std::runtime_error("wasm_malloc: malloc returned no result");
 		}
-		//std::cout << "wasm_malloc returned ptr: " << result[0].i32() << std::endl;
-
+		// std::cout << "wasm_malloc returned ptr: " << result[0].i32() << std::endl;
 
 		// memory pool is auto growing! nice.
 		// auto mem_size_pages = m_memory->size(m_store);
@@ -385,14 +339,14 @@ private:
 		// auto mem_size_kb = (mem_size_pages * 64);
 		// std::cout << "        size now (kilobytes): " << mem_size_kb << " KB\n";
 
-
 		return result[0].i32();
 	}
 
-
-	int32_t wasm_free(int32_t ptr) {
-		//std::cout << "wasm_free called with ptr: " << ptr << std::endl;
-		if (!m_wfn_free.has_value()) {
+	int32_t wasm_free(int32_t ptr)
+	{
+		// std::cout << "wasm_free called with ptr: " << ptr << std::endl;
+		if (!m_wfn_free.has_value())
+		{
 			throw std::runtime_error("wasm_free: free function not found in WASM module");
 		}
 
@@ -400,84 +354,88 @@ private:
 		uint32_t zero = 'abcd';
 		this->wasm_memcpy_to(ptr, &zero, 4);
 
-
-		std::vector<wasmtime::Val> args = { wasmtime::Val(ptr) };
+		std::vector<wasmtime::Val> args = {wasmtime::Val(ptr)};
 		auto result = m_wfn_free.value().call(m_store, args).unwrap();
-		if (!result.empty()) {
+		if (!result.empty())
+		{
 			std::cout << "wasm_free returned value: " << result[0].i32() << std::endl;
 			return result[0].i32();
 		}
-		//std::cout << "wasm_free returned 0" << std::endl;
+		// std::cout << "wasm_free returned 0" << std::endl;
 		return 0;
 	}
 
-
-
-
-	//copy data into WASM space
-	void wasm_memcpy_to( int32_t target_offset, void* data, int32_t size ){
-		if (!m_memory.has_value()) {
+	// copy data into WASM space
+	void wasm_memcpy_to(int32_t target_offset, void *data, int32_t size)
+	{
+		if (!m_memory.has_value())
+		{
 			throw std::runtime_error("wasm_memcpy_to: WASM memory not available");
 		}
 		auto mem_data = m_memory->data(*m_store);
-		if (target_offset < 0 || target_offset + size > mem_data.size()) {
+		if (target_offset < 0 || target_offset + size > mem_data.size())
+		{
 			throw std::runtime_error("wasm_memcpy_to: target offset/size out of bounds");
 		}
 		std::memcpy(mem_data.data() + target_offset, data, size);
 	}
 
-	//copy data out of WASM space
-	void wasm_memcpy_from( void* data, int32_t target_offset, int32_t size ){
-		if (!m_memory.has_value()) {
+	// copy data out of WASM space
+	void wasm_memcpy_from(void *data, int32_t target_offset, int32_t size)
+	{
+		if (!m_memory.has_value())
+		{
 			throw std::runtime_error("wasm_memcpy_from: WASM memory not available");
 		}
 		auto mem_data = m_memory->data(*m_store);
-		if (target_offset < 0 || target_offset + size > mem_data.size()) {
+		if (target_offset < 0 || target_offset + size > mem_data.size())
+		{
 			throw std::runtime_error("wasm_memcpy_from: target offset/size out of bounds");
 		}
 		std::memcpy(data, mem_data.data() + target_offset, size);
 	}
 
-
-
-	void wasm_strcpy_to( const uint32_t offset, const char* src ){
-		if (!src) {
+	void wasm_strcpy_to(const uint32_t offset, const char *src)
+	{
+		if (!src)
+		{
 			throw std::runtime_error("wasm_strcpy_to: src is null");
 		}
 		size_t len = std::strlen(src) + 1; // include null terminator
-		this->wasm_memcpy_to(offset, (void*)src, static_cast<int32_t>(len));
+		this->wasm_memcpy_to(offset, (void *)src, static_cast<int32_t>(len));
 	}
 
-
-
-	void wasm_strcpy_from(char* dest, uint32_t offset, int32_t max_len = 4096) {
-		if (!m_memory.has_value()) {
+	void wasm_strcpy_from(char *dest, uint32_t offset, int32_t max_len = 4096)
+	{
+		if (!m_memory.has_value())
+		{
 			throw std::runtime_error("wasm_strcpy_from: WASM memory not available");
 		}
 		auto mem_data = m_memory->data(*m_store);
-		if (offset < 0 || offset >= mem_data.size()) {
+		if (offset < 0 || offset >= mem_data.size())
+		{
 			throw std::runtime_error("wasm_strcpy_from: offset out of bounds");
 		}
 
 		int32_t i = 0;
 		// for (; i < max_len - 1 && (offset + i) < mem_data.size(); ++i) {
-		for(;;){
-			if( i > mem_data.size() ){
+		for (;;)
+		{
+			if (i > mem_data.size())
+			{
 				// std::cout << " * end of memory break\n";
 				break;
 			}
 
 			dest[i] = mem_data[offset + i];
-			if (dest[i] == '\0'){
+			if (dest[i] == '\0')
+			{
 				// std::cout << " * hit null byte break\n";
 				break;
 			}
-			 
+
 			++i;
 		}
 		dest[i] = '\0';
 	}
-
-
-
 };
