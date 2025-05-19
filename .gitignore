@@ -10,3 +10,6 @@ Makefile
 
 
 /examples/wasm_plugin_basic/build
+
+# Ignore the expanded folders. Keep the zips.
+/xpl/third_party/XPSDK410
