@@ -6,13 +6,7 @@
 #include <iomanip>
 
 
-
 using namespace wasmtime;
-
-
-
-
-
 
 
 class XP_API{

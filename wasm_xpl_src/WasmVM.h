@@ -14,7 +14,7 @@ using namespace wasmtime;
 
 class WasmVM {
 public:
-    WasmVM( std::string &filename ) {
+    explicit WasmVM( std::string &filename ) {
         
 		wasmtime::Config config;
         config.consume_fuel(true);
@@ -53,13 +53,6 @@ public:
 		//}
 
 
-
-
-
-
-
-
-
 		// add our custom host API into the wasm mix.
 		XP_API::init( linker, m_store );
 
@@ -75,10 +68,6 @@ public:
 	//        std::cerr << "Failed to create module" << std::endl;
 	//        return 1;
 	//    }
-
-
-
-
 
 
 
@@ -100,7 +89,6 @@ public:
 
 
 
-
 		
 		std::cout << "Attempting to instantiate user WASM\n";
 		m_instance = new wasmtime::Instance(linker.instantiate(m_store, module).unwrap());
@@ -111,8 +99,6 @@ public:
 	//        return 1;
 	//    }
 		std::cout << "  Success\n";
-
-
 
 
 		std::cout << "Finding WASM memory export..\n";
@@ -129,8 +115,7 @@ public:
 		std::cout << "        size now (kilobytes): " << mem_size_kb << " KB\n";
 
 
-
-
+		// find plugin_start,stop,enable,etc
 		this->bind_wasm_exports();
 		
 		
@@ -175,16 +160,11 @@ public:
 		find_and_save_func(m_wfn_plugin_message, "plugin_message");
 
 
-
 		// - plugin_update() ?
 		// - plugin_flightloop()
 		// - plugin_draw() - should we add a bunch specifically for avionics?
 
 	}
-
-
-
-
 
 
 
@@ -356,9 +336,9 @@ private:
 	std::optional<wasmtime::Func> m_wfn_plugin_message;
 	
 
-	char outName[256];
-	char outSig[256];
-	char outDesc[256];
+	char outName[256]{};
+	char outSig[256]{};
+	char outDesc[256]{};
 	
 
 
