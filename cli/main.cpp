@@ -1,8 +1,4 @@
-// #include <fstream>
 #include <iostream>
-// #include <sstream>
-// #include <wasmtime.hh>
-// #include <cstring>
 
 #include "WasmVM.h"
 
