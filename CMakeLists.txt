@@ -9,12 +9,12 @@ set(LNK_WASMTIME ../wasmtime/wasmtime_src/wasmtime/lib)
 set(LIB_WASMTIME wasmtime)
 
 
-set(INC_WASM_XPL ${CMAKE_SOURCE_DIR}/wasm_xpl_src)
+set(INC_WASM_XPL_CORE ${CMAKE_SOURCE_DIR}/core_src)
 
 
 include_directories(
         ${INC_WASMTIME}
-        ${INC_WASM_XPL}
+        ${INC_WASM_XPL_CORE}
         )
 
 link_directories(
