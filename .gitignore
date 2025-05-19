@@ -4,6 +4,7 @@
 /build_win
 /build_mac
 
+/cmake-build-debug
 cmake_install.cmake
 
 Makefile

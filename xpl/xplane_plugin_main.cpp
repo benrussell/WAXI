@@ -12,16 +12,29 @@ WasmVM* global_WasmVM;
 // Plugin start function
 PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
 
-    //FIXME: enable native paths
-    //FIXME: enable other good stuff?
+    // XPLMEnableFeature("XPLM_WANTS_REFLECTIONS", 1);
+    XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);
+    XPLMEnableFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS", 1);
+    //XPLMEnableFeature("XPLM_WANTS_DATAREF_NOTIFICATIONS", 1);
+    
+    
+    char path[1024];
+    XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
 
+    // Extract the folder path from the full path
+    std::string fullPath(path);
+    std::string caFolderName = fullPath.substr(0, fullPath.find_last_of("/\\"));
+
+    // Modify the folder path to point to the resources directory
+    std::string resourcesPath = caFolderName + "/resources/";
+
+    
     //FIXME: determine path to loaded plugin so that we can load from its resource bundle
 
     std::string filename = "lame.wasm";
     global_WasmVM = new WasmVM( filename );
 
-    
-    //FIXME: these should be able to be populated by the WASM module.
+    // These values should be over-written by the call to plugin_start()
     strncpy(outName, "Wasm Plugin", 255);
     strncpy(outSig, "com.example.wasmplugin", 255);
     strncpy(outDesc, "A plugin that runs WebAssembly modules.", 255);
@@ -29,9 +42,8 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     // The outName, outSig, and outDesc buffers are guaranteed to be at least 256 bytes each.
     // Reference: X-Plane SDK documentation.
 
-    //int wasm_ret = global_WasmVM->call_plugin_start( outName, outSig, outDesc );
-    int wasm_ret = global_WasmVM->call_plugin_start();
-
+    int wasm_ret = global_WasmVM->call_plugin_start( outName, outSig, outDesc );
+    
 
     return wasm_ret;
 }

@@ -150,7 +150,7 @@ public:
 		// - plugin_draw() - should we add a bunch specifically for avionics?
 	}
 
-	int call_plugin_start()
+	int call_plugin_start( char* outName, char* outSig, char* outDesc )
 	{
 		// plugin start takes 3 char buffers
 		this->set_fuel(m_fuel);
@@ -291,9 +291,10 @@ private:
 	std::optional<wasmtime::Func> m_wfn_plugin_disable;
 	std::optional<wasmtime::Func> m_wfn_plugin_message;
 
-	char outName[256]{};
-	char outSig[256]{};
-	char outDesc[256]{};
+	// These are passed back to the host caller fn.
+	// char outName[256]{};
+	// char outSig[256]{};
+	// char outDesc[256]{};
 
 	std::vector<uint8_t> read_file(const std::string &filename)
 	{
