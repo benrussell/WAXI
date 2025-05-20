@@ -1,3 +1,7 @@
+#ifndef XP_API_H
+#define XP_API_H
+
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -5,77 +9,39 @@
 #include <cstring>
 #include <iomanip>
 
+//#include "WasmVM.h"
+
+#include "LinkerHelpers.h"
+
 
 using namespace wasmtime;
+
+
+
+
 
 
 class XP_API{
     
 private:
-    // Helper to wrap and expose functions with (Caller, char*) signature
-    static auto wrap_and_expose_caller_charptr(
-            wasmtime::Linker &linker, 
-            const std::string &mod,
-            const std::string &name,
-            int64_t(*fn)(Caller, char*) //signature that we need to wrap
-        ) {
-        return linker.func_wrap(
-            mod, name,
-            // We're using a lambda closure here to augment the functionality.
-            //ptrs into wasm memory space are only 32bit
-            [fn](Caller caller, int32_t ptr) -> int64_t {
-                // Get memory from the caller
-                auto memory_export = caller.get_export("memory");
-                if (!memory_export || !std::holds_alternative<wasmtime::Memory>(*memory_export)) {
-                    std::cerr << "Memory not found in caller" << std::endl;
-                    return -1;
-                }
-                auto memory = &std::get<wasmtime::Memory>(*memory_export);
-
-
-                // Read the string from WASM memory
-                auto mem_data = memory->data(caller);
-                
-                //calc the size of the c_str we're being passed.
-                size_t len = 0;
-                while ((ptr + len) < mem_data.size() && mem_data[ptr + len] != '\0') {
-                    ++len;
-                }
-
-                std::vector<char> buf(len + 1, 0);
-                std::memcpy(buf.data(), mem_data.data() + ptr, len);
-
-                // Call the actual function
-                return fn(caller, buf.data());
-            }
-        );
-    }
 
 
 
 public:
 
+
     static void init(wasmtime::Linker &linker, wasmtime::Store *store){
         
         // provide some host fns
-		
-        // Lambda to wrap a C++ function and expose it to WASM
-        auto wrap_and_expose = [&](auto cpp_fn, const std::string &mod, const std::string &name) {
-            return linker.func_wrap(mod, name, cpp_fn);
-        };
-
-
-
+	
         // // Expose host_test
         // auto res1 = wrap_and_expose(XP_API::host_test, "host", "host_test");
         // // Expose host_foo
         // auto res2 = wrap_and_expose(XP_API::host_foo, "host", "host_foo");
 
-
-        auto res3 = wrap_and_expose_caller_charptr(linker, "dref", "find", XP_API::dref_find);
-        auto res4 = wrap_and_expose(XP_API::dref_getFloat, "dref", "getFloat");
-        auto res5 = wrap_and_expose(XP_API::dref_setFloat, "dref", "setFloat");
-
+        auto res3 = LinkerHelpers::wrap_and_expose_caller_charptr(linker, "dref", "find", XP_API::dref_find);
+        auto res4 = LinkerHelpers::wrap_and_expose(linker, XP_API::dref_getFloat, "dref", "getFloat");
+        auto res5 = LinkerHelpers::wrap_and_expose(linker, XP_API::dref_setFloat, "dref", "setFloat");
 
     }
 
@@ -138,3 +104,11 @@ public:
 
 
 float XP_API::m_dr_values[3];
+
+
+
+
+
+
+
+#endif
