@@ -39,9 +39,16 @@ public:
         // // Expose host_foo
         // auto res2 = wrap_and_expose(XP_API::host_foo, "host", "host_foo");
 
+        std::cout << ">> api/ export dref module" << std::endl;
         auto res3 = LinkerHelpers::wrap_and_expose_caller_charptr(linker, "dref", "find", XP_API::dref_find);
         auto res4 = LinkerHelpers::wrap_and_expose(linker, XP_API::dref_getFloat, "dref", "getFloat");
         auto res5 = LinkerHelpers::wrap_and_expose(linker, XP_API::dref_setFloat, "dref", "setFloat");
+
+        std::cout << ">> api/ export cmd module" << std::endl;
+        auto res6 = LinkerHelpers::wrap_and_expose_caller_charptr(linker, "cmd", "find", XP_API::cmd_find);
+        auto res7 = LinkerHelpers::wrap_and_expose(linker, XP_API::cmd_begin, "cmd", "begin");
+        auto res8 = LinkerHelpers::wrap_and_expose(linker, XP_API::cmd_end, "cmd", "end");
+        auto res9 = LinkerHelpers::wrap_and_expose(linker, XP_API::cmd_once, "cmd", "once");
 
     }
 
@@ -59,6 +66,45 @@ public:
     //     std::cout << ">> api/ host_foo(" << arg << ")" << std::endl;
     //     return arg - 1;
     // }
+
+
+
+    static int64_t cmd_find(Caller caller, char* cmd_name ) {
+        std::cout << ">> api/ cmd_find(" << cmd_name << ")" << std::endl;
+
+        // Example array of three char* values
+        static const char* cmd_names[] = { "cmd/a", "cmd/b", "cmd/c" };
+
+        for (int i = 0; i < 3; ++i) {
+            if (std::strcmp(cmd_names[i], cmd_name) == 0) {
+            return i;
+            }
+        }
+
+        std::cerr << " * Invalid cmd name: " << cmd_name << std::endl;
+        return -1;
+    }
+
+
+    static void cmd_begin(Caller caller, int32_t cmdh ) {
+        std::cout << ">> api/ cmd_begin(" << cmdh << ")" << std::endl;
+    }
+
+
+    static void cmd_end(Caller caller, int32_t cmdh ) {
+        std::cout << ">> api/ cmd_end(" << cmdh << ")" << std::endl;
+    }
+
+
+    static void cmd_once(Caller caller, int32_t cmdh ) {
+        std::cout << ">> api/ cmd_once(" << cmdh << ")" << std::endl;
+    }
+
+
+
+
+
+
 
 
       
