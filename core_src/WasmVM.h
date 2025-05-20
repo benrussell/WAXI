@@ -283,6 +283,11 @@ public:
 		return fuel_level;
 	}
 
+
+
+
+
+
 private:
 	wasmtime::Store *m_store;
 	wasmtime::Instance *m_instance;
