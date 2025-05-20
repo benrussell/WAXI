@@ -66,10 +66,10 @@ public:
 
 
 
-        // Expose host_test
-        auto res1 = wrap_and_expose(XP_API::host_test, "host", "host_test");
-        // Expose host_foo
-        auto res2 = wrap_and_expose(XP_API::host_foo, "host", "host_foo");
+        // // Expose host_test
+        // auto res1 = wrap_and_expose(XP_API::host_test, "host", "host_test");
+        // // Expose host_foo
+        // auto res2 = wrap_and_expose(XP_API::host_foo, "host", "host_foo");
 
 
         auto res3 = wrap_and_expose_caller_charptr(linker, "dref", "find", XP_API::dref_find);
@@ -82,17 +82,17 @@ public:
 
 
 
-    // Define a host function
-    static void host_test(Caller caller, int32_t arg, int32_t arg2, int32_t arg3) {
-        std::cout << ">> api/ host_test() arg1: " << arg 
-              << ", arg2: " << arg2 
-              << ", arg3: " << arg3 << std::endl;
-    }
+    // // Define a host function
+    // static void host_test(Caller caller, int32_t arg, int32_t arg2, int32_t arg3) {
+    //     std::cout << ">> api/ host_test() arg1: " << arg 
+    //           << ", arg2: " << arg2 
+    //           << ", arg3: " << arg3 << std::endl;
+    // }
 
-    static int host_foo(Caller caller, int32_t arg) {
-        std::cout << ">> api/ host_foo(" << arg << ")" << std::endl;
-        return arg - 1;
-    }
+    // static int host_foo(Caller caller, int32_t arg) {
+    //     std::cout << ">> api/ host_foo(" << arg << ")" << std::endl;
+    //     return arg - 1;
+    // }
 
 
       
