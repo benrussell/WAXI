@@ -3,9 +3,6 @@
     "sig": "wasm_xpl/template_sig",
     "desc": "wasm_xpl config example",
 
-    "author": "",
-    "web": "",
-
     "vfs":[
         ["{plugin_root}/vfs_root/", "/"],
 
