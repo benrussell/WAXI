@@ -1,3 +1,7 @@
+#ifndef WASMVM_H
+#define WASMVM_H
+
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -444,3 +448,6 @@ private:
 		dest[i] = '\0';
 	}
 };
+
+
+#endif
