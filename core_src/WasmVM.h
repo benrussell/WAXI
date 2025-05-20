@@ -9,7 +9,7 @@
 #include <cstring>
 #include <iomanip>
 
-#include "XP_API.h"
+#include "xp_api/xp_api.h"
 
 using namespace wasmtime;
 
