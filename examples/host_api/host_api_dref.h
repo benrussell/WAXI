@@ -26,3 +26,6 @@ extern "C" {
     DREF_IMPORT(void, setInt, int32_t, int32_t)
 
 }
+
+
+#undef DREF_IMPORT

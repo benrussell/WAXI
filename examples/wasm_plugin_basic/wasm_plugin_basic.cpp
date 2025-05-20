@@ -99,8 +99,13 @@ int plugin_enable(){
 
     test_drefs();
 
-
-
+    printf("wasm/ cmd test\n");
+    auto cmdh_b = cmd_find("cmd/b");
+    auto cmdh_c = cmd_find("cmd/c");
+    cmd_begin(cmdh_c);
+    cmd_end(cmdh_c);
+    cmd_once(cmdh_b);
+    
 
     // List all files in the current folder using filesystem APIs
     printf("wasm/ Listing files in the current folder:\n");
