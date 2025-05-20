@@ -8,6 +8,7 @@
 #include <cstring>
 #include <iostream>
 #include <cstdio>
+#include <dirent.h>
 
 
 #include "host_api.h"
@@ -97,6 +98,29 @@ int plugin_enable(){
     printf("wasm/ plugin_enable() msg_counter: %llu\n", msg_counter);
 
     test_drefs();
+
+
+
+
+    // List all files in the current folder using filesystem APIs
+    printf("wasm/ Listing files in the current folder:\n");
+
+    DIR* dir = opendir(".");
+    if (dir == nullptr) {
+        perror("opendir");
+        return msg_counter;
+    }
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        printf("  %s\n", entry->d_name);
+    }
+
+    closedir(dir);
+    
+
+
+
 
     return msg_counter;
 }

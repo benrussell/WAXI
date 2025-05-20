@@ -42,6 +42,10 @@ public:
 		wasi.inherit_stdin();
 		wasi.inherit_stdout();
 		wasi.inherit_stderr();
+		if( ! wasi.preopen_dir("./vfs_root", "/") ){\
+			std::cout << "Failed to open VFS folder.\n";
+			exit(1);
+		}
 		m_store->context().set_wasi(std::move(wasi)).unwrap();
 
 		// Instantiate the module
