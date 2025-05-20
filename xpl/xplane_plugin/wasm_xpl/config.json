@@ -1,0 +1,21 @@
+{
+    "name": "wasm_xpl template",
+    "sig": "wasm_xpl/template_sig",
+    "desc": "wasm_xpl config example",
+
+    "author": "",
+    "web": "",
+
+    "vfs":[
+        ["{plugin_root}/vfs_root/", "/"],
+
+        ["{xp_root}/", "/X-Plane"],
+        ["{plugin_root}/vfs_lock/", "/X-Plane/Aircraft"],
+        ["{plugin_root}/vfs_lock/", "/X-Plane/Resources/plugins"],
+        
+        ["{acf_root}/", "/Aircraft"],
+        ["{plugin_root}/vfs_lock/", "/Aircraft/plugins"]
+    ],
+
+    "plugin_config": {}
+}
