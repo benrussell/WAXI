@@ -24,6 +24,8 @@ extern "C" {
 
     void plugin_message( int64_t inFromWho, int64_t inMessage, int32_t inParam );
 
+    void plugin_flcb_proxy( int32_t fptr );
+
 
 } //extern
 
@@ -35,6 +37,24 @@ static uint64_t msg_counter = 0;
 
 
 
+
+void test_cbf(){
+    printf("wasm: test_cbf() exec!\n");
+}
+
+void test_cbf2(){
+    printf("wasm: test_cbf2() exec!&******************\n");
+}
+
+
+void test_cmds(){
+    printf("wasm/ cmd test\n");
+    auto cmdh_b = cmd_find("cmd/b");
+    auto cmdh_c = cmd_find("cmd/c");
+    cmd_begin(cmdh_c);
+    cmd_end(cmdh_c);
+    cmd_once(cmdh_b);
+}
 
 void test_drefs(){
     printf("wasm/ Running basic dataref tests..\n");
@@ -63,7 +83,6 @@ void test_drefs(){
 
 
 
-
 int plugin_start(char* outName, char* outSig, char* outDesc) {
 
     // printf("wasm/ plugin_start: [%p], [%p], [%p]\n", outName, outSig, outDesc );
@@ -83,10 +102,24 @@ int plugin_start(char* outName, char* outSig, char* outDesc) {
     
     log_raw(" --- this is a call to XPLMDebugString from wasm byte code ---\n");
 
+
+    
+    
+    printf("calling cb_reg cbf2..\n");
+    cb_reg( (int32_t) &test_cbf2 );
+    
+
+
     // ret 1 to start, 0 to refuse.
     return 1;
 }
 
+
+// We use this to proxy into the WASM flat memory block.
+void plugin_flcb_proxy( int32_t fptr ){
+    printf("wasm/ plugin_flcb_proxy() fptr: %i\n", fptr);
+    ((void(*)())fptr)();
+}
 
 
 void plugin_stop(){
@@ -98,15 +131,9 @@ void plugin_stop(){
 int plugin_enable(){
     printf("wasm/ plugin_enable() msg_counter: %llu\n", msg_counter);
 
-    test_drefs();
+    //test_drefs();
 
-    printf("wasm/ cmd test\n");
-    auto cmdh_b = cmd_find("cmd/b");
-    auto cmdh_c = cmd_find("cmd/c");
-    cmd_begin(cmdh_c);
-    cmd_end(cmdh_c);
-    cmd_once(cmdh_b);
-    
+    //test_cmds();
 
     // List all files in the current folder using filesystem APIs
     printf("wasm/ Listing files in the current folder:\n");

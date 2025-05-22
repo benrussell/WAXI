@@ -16,7 +16,7 @@ add_executable(wasm_plugin_basic.wasm wasm_plugin_basic.cpp)
 
 # Pass exported functions to the linker (for Emscripten)
 set_target_properties(wasm_plugin_basic.wasm PROPERTIES
-    LINK_FLAGS "-Wl,--export=plugin_start -Wl,--export=plugin_stop -Wl,--export=plugin_enable -Wl,--export=plugin_disable -Wl,--export=plugin_message -Wl,--export=malloc -Wl,--export=free -Wl,--allow-undefined "
+    LINK_FLAGS "-Wl,--export=plugin_start -Wl,--export=plugin_stop -Wl,--export=plugin_enable -Wl,--export=plugin_disable -Wl,--export=plugin_message -Wl,--export=plugin_flcb_proxy -Wl,--export=malloc -Wl,--export=free -Wl,--allow-undefined "
 )
 
 
