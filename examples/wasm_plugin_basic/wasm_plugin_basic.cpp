@@ -81,9 +81,15 @@ void test_drefs(){
 
 }
 
+extern "C" void __wasm_call_ctors();
+
 
 
 int plugin_start(char* outName, char* outSig, char* outDesc) {
+
+
+    __wasm_call_ctors();
+
 
     // printf("wasm/ plugin_start: [%p], [%p], [%p]\n", outName, outSig, outDesc );
     // printf("wasm/ plugin_start: [%s], [%s], [%s]\n", outName, outSig, outDesc );
@@ -91,8 +97,8 @@ int plugin_start(char* outName, char* outSig, char* outDesc) {
 
     // FIXME: this crashes. :-(
     // CPP io stream test
-    // std::cout << "wasm/ CPP plugin_start\n";
-    // std::flush( std::cout );
+    std::cout << "wasm/ CPP plugin_start\n";
+    std::flush( std::cout );
 
     snprintf(outName, 256, "Basic WASM Plugin Example");
     snprintf(outSig,  256, "wasm_xpl/examples/wasm_plugin_basic");
