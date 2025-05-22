@@ -9,6 +9,73 @@
 WasmVM* global_WasmVM;
 
 
+
+
+
+
+// Flight loop callback function
+float CustomFlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
+    // Custom logic for the flight loop callback
+    //std::cout << "CustomFlightLoopCallback\n";
+    std::cout << "CustomFlightLoopCallback called. Elapsed time: " << inElapsedSinceLastCall << " seconds.\n";
+
+    // Example: Call a function in the WasmVM
+    if (global_WasmVM) {
+        //global_WasmVM->call_flight_loop(inElapsedSinceLastCall, inElapsedTimeSinceLastFlightLoop, inCounter);
+    }
+
+    // Return the interval in seconds for the next callback
+    return 0.1f; // Call again in 1 second
+}
+
+
+// Register the flight loop callback
+void RegisterFlightLoopCallback() {
+    std::cout << "wasm_xpl/ registering flcb\n";
+    //XPLMRegisterFlightLoopCallback(CustomFlightLoopCallback, 1.0f, nullptr); // Initial interval of 1 second
+
+
+    // Output the pointer address of CustomFlightLoopCallback as a decimal value
+    printf("wasm_xpl/ flcb ptr: %p\n", &CustomFlightLoopCallback);
+
+    // Create a flight loop structure
+    XPLMCreateFlightLoop_t flightLoopParams;
+    flightLoopParams.structSize = sizeof(XPLMCreateFlightLoop_t);
+    flightLoopParams.refcon = nullptr;
+    flightLoopParams.callbackFunc = CustomFlightLoopCallback;
+    flightLoopParams.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
+    //flightLoopParams.phase = xplm_FlightLoop_Phase_AfterFlightModel;
+
+    printf("wasm_xpl handoff: fl_param.callbackFunc: %p\n", flightLoopParams.callbackFunc);
+
+    printf(" handoff stackptr for flcb_params: %p\n", &flightLoopParams);
+
+    // Create the flight loop
+    XPLMFlightLoopID flightLoopID = XPLMCreateFlightLoop(&flightLoopParams);
+
+
+    // Schedule the flight loop to run
+    XPLMScheduleFlightLoop(
+        flightLoopID, 
+        0.01f, 
+        1
+    );
+
+
+}
+
+// Unregister the flight loop callback
+void UnregisterFlightLoopCallback() {
+    //XPLMUnregisterFlightLoopCallback(CustomFlightLoopCallback, nullptr);
+}
+
+
+
+
+
+
+
+
 // Plugin start function
 PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
 
@@ -17,7 +84,10 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     XPLMEnableFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS", 1);
     //XPLMEnableFeature("XPLM_WANTS_DATAREF_NOTIFICATIONS", 1);
     
-    
+    // Ensure the callback is registered during plugin initialization
+    RegisterFlightLoopCallback();
+
+
     char path[1024];
     XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
 
