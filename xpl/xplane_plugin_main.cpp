@@ -2,6 +2,7 @@
 #include "XPLMPlugin.h"
 #include "XPLMProcessing.h"
 #include "XPLMUtilities.h"
+#include "XPLMPlanes.h"
 
 #include "WasmVM.h"
 
@@ -17,7 +18,7 @@ WasmVM* global_WasmVM;
 float CustomFlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
     // Custom logic for the flight loop callback
     //std::cout << "CustomFlightLoopCallback\n";
-    std::cout << "CustomFlightLoopCallback called. Elapsed time: " << inElapsedSinceLastCall << " seconds.\n";
+    //std::cout << "CustomFlightLoopCallback called. Elapsed time: " << inElapsedSinceLastCall << " seconds.\n";
 
     // Example: Call a function in the WasmVM
     if (global_WasmVM) {
@@ -72,7 +73,14 @@ void UnregisterFlightLoopCallback() {
 
 
 
+struct ConfigVals{
+    std::string plugin_folder;
+    std::string xp_folder;
+    std::string acf_folder;
+};
 
+
+ConfigVals g_config;
 
 
 
@@ -88,32 +96,68 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     RegisterFlightLoopCallback();
 
 
-    char path[1024];
-    XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
-
-    // Extract the folder path from the full path
-    std::string fullPath(path);
-    std::string caFolderName = fullPath.substr(0, fullPath.find_last_of("/\\"));
-
-    // Modify the folder path to point to the resources directory
-    std::string resourcesPath = caFolderName + "/resources/";
-
+    // Need to determine:
+    // - {plugin_root} - done
     
-    //FIXME: determine path to loaded plugin so that we can load from its resource bundle
+    {
+        char path[1024]{};
+        XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
+        std::cout << "wasm_xpl/ plugin info gave us path: ["<< path <<"]\n";
 
-    std::string filename = "lame.wasm";
-    global_WasmVM = new WasmVM( filename );
+        // Extract the folder path from the full path
+        std::string fullPath(path);
+        std::string pluginFolderName = fullPath.substr(0, fullPath.find_last_of("/\\")); //strip the plugin filename
+        pluginFolderName = pluginFolderName.substr(0, pluginFolderName.find_last_of("/\\")); //strip the os_64 leaf
+
+        g_config.plugin_folder = pluginFolderName;
+        std::cout << "wasm_xpl/ plugin_folder: [" << g_config.plugin_folder << "]\n";
+    }
+
+    // - {xp_root}
+    {
+        char xpFolder[1024]{};
+        XPLMGetSystemPath(xpFolder);
+        std::string xpRootPath(xpFolder);
+        
+        g_config.xp_folder = xpRootPath;
+        std::cout << "wasm_xpl/ xp_folder: [" << g_config.xp_folder << "]\n";
+    }
+    
+    // - {acf_root}
+    {
+        char acfFilename[1024]{};
+        char acfFolder[1024]{};
+        XPLMGetNthAircraftModel(0, acfFilename, acfFolder); // Get the path of the user's aircraft
+        //std::cout << "wasm_xpl/ Aircraft full path: [" << acfFilename << "]\n";
+        //std::cout << "wasm_xpl/ Aircraft API folder path: [" << acfFolder << "]\n";
+        
+        g_config.acf_folder = acfFolder;
+        std::cout << "wasm_xpl/ acf_folder: [" << g_config.acf_folder << "]\n";
+    }
+
+
+
+//README: need generic callback registration and callback with refcon    
+
+
+    //FIXME: wasm filename? config.json entry?
+    //std::string filename = acfFolderPath + "/wasm_plugin_basic.wasm";
+    std::string wasm_filename = "/home/br/Dev/wasm/wasm_xpl/examples/wasm_plugin_basic/build/wasm_plugin_basic.wasm";
+    global_WasmVM = new WasmVM( wasm_filename );
 
     // These values should be over-written by the call to plugin_start()
-    strncpy(outName, "Wasm Plugin", 255);
-    strncpy(outSig, "com.example.wasmplugin", 255);
-    strncpy(outDesc, "A plugin that runs WebAssembly modules.", 255);
+    strncpy(outName, "WASM Plugin Shim", 255);
+    strncpy(outSig, "x-plugins.com/wasm_xpl", 255);
+    strncpy(outDesc, "WASM for X-Plane", 255);
 
     // The outName, outSig, and outDesc buffers are guaranteed to be at least 256 bytes each.
     // Reference: X-Plane SDK documentation.
 
+    //XPLMDebugString("wasm_xpl/ Calling into wasm start...\n");
     int wasm_ret = global_WasmVM->call_plugin_start( outName, outSig, outDesc );
     
+    
+    XPLMDebugString("wasm_xpl/ Plugin started...\n");
 
     return wasm_ret;
 }
