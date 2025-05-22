@@ -158,6 +158,8 @@ public:
 		find_and_save_func(m_wfn_plugin_disable, "plugin_disable");
 		find_and_save_func(m_wfn_plugin_message, "plugin_message");
 
+		find_and_save_func(m_wfn_plugin_flcb_proxy, "plugin_flcb_proxy");
+
 		// - plugin_update() ?
 		// - plugin_flightloop()
 		// - plugin_draw() - should we add a bunch specifically for avionics?
@@ -198,11 +200,11 @@ public:
 		if (ret)
 		{
 			wasm_strcpy_from(outName, ptr_a);
-			std::cout << "  outName: [" << outName << "]\n";
+			//std::cout << "  outName: [" << outName << "]\n";
 			wasm_strcpy_from(outSig, ptr_b);
-			std::cout << "   outSig: [" << outSig << "]\n";
+			//std::cout << "   outSig: [" << outSig << "]\n";
 			wasm_strcpy_from(outDesc, ptr_c);
-			std::cout << "  outDesc: [" << outDesc << "]\n";
+			//std::cout << "  outDesc: [" << outDesc << "]\n";
 		}
 		else
 		{
@@ -308,6 +310,8 @@ private:
 	std::optional<wasmtime::Func> m_wfn_plugin_enable;
 	std::optional<wasmtime::Func> m_wfn_plugin_disable;
 	std::optional<wasmtime::Func> m_wfn_plugin_message;
+
+	std::optional<wasmtime::Func> m_wfn_plugin_flcb_proxy;
 
 	// These are passed back to the host caller fn.
 	// char outName[256]{};
