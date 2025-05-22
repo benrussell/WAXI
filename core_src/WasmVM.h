@@ -245,6 +245,18 @@ public:
 
 		std::cout << "\n> host/call: plugin_enable\n";
 		auto result = m_wfn_plugin_enable.value().call(m_store, {}).unwrap();
+
+
+		
+		printf( "wasm flcb cbf_ptr: %i\n", xp_api::cb::glob_cbf_ptr );
+		auto res_prox = m_wfn_plugin_flcb_proxy.value().call( 
+			m_store, 
+			{
+			wasmtime::Val(xp_api::cb::glob_cbf_ptr)
+			}
+		).unwrap();
+		
+
 		this->check_fuel();
 
 		return 1;
