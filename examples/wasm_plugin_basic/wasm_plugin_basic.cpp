@@ -81,6 +81,7 @@ int plugin_start(char* outName, char* outSig, char* outDesc) {
 
     printf("wasm/ Hello World! plugin_start() is working.\n");
     
+    log_raw(" --- this is a call to XPLMDebugString from wasm byte code ---\n");
 
     // ret 1 to start, 0 to refuse.
     return 1;

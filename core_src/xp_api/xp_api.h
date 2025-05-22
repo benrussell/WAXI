@@ -21,7 +21,7 @@ using namespace wasmtime;
 namespace xp_api{}
 #include "xp_api_cmd.h"
 #include "xp_api_dref.h"
-
+#include "xp_api_log.h"
 
 class XP_API{ //FIXME: this needs a new name.
 
@@ -41,6 +41,10 @@ public:
         auto res7 = LinkerHelpers::wrap_and_expose(linker, xp_api::cmd::begin, "cmd", "begin");
         auto res8 = LinkerHelpers::wrap_and_expose(linker, xp_api::cmd::end, "cmd", "end");
         auto res9 = LinkerHelpers::wrap_and_expose(linker, xp_api::cmd::once, "cmd", "once");
+
+        std::cout << ">> api/ export log module" << std::endl;
+        auto res10 = LinkerHelpers::wrap_and_expose_caller_charptr(linker, "log", "raw", xp_api::log::raw);
+        
 
     }
 
