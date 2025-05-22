@@ -27,7 +27,10 @@ set( USE_LIBS
 )
 
 
-subdirs( "cli" "xpl" )
+subdirs( 
+        #"cli"  # Use XPL_WorkBench.
+        "xpl"
+        )
 
 
 # add_executable(wasm_host
