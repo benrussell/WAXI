@@ -1,7 +1,8 @@
 #ifndef WASMVM_H
 #define WASMVM_H
 
-
+#include <filesystem>
+		
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -38,6 +39,10 @@ public:
 		wasmtime::Engine engine(std::move(config));
 
 		m_store = new wasmtime::Store(engine);
+
+
+		std::cout << "wasm_xpl: Current working directory: " << std::filesystem::current_path() << std::endl;
+
 
 		std::cout << "Init WASI\n";
 		WasiConfig wasi;
