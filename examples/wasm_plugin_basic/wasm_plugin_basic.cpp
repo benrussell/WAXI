@@ -16,6 +16,8 @@
 
 
 extern "C" {
+    //int main(void); //does it need an export?
+
     int plugin_start(char* outName, char* outSig, char* outDesc);
     void plugin_stop();
 
@@ -24,6 +26,8 @@ extern "C" {
 
     void plugin_message( int64_t inFromWho, int64_t inMessage, int32_t inParam );
 
+
+    //it may be possible to replace this with fn resolution at the host side.
     void plugin_flcb_proxy( int32_t fptr );
 
 
@@ -81,21 +85,23 @@ void test_drefs(){
 
 }
 
-extern "C" void __wasm_call_ctors();
+
+
+int main(void){
+    printf("main is required by WASI _start()\n");
+    return 0;
+}
 
 
 
 int plugin_start(char* outName, char* outSig, char* outDesc) {
-
-
-    __wasm_call_ctors();
-
-
     // printf("wasm/ plugin_start: [%p], [%p], [%p]\n", outName, outSig, outDesc );
     // printf("wasm/ plugin_start: [%s], [%s], [%s]\n", outName, outSig, outDesc );
     //fflush( stdout );
 
-    // FIXME: this crashes. :-(
+    printf("plugin_start()... about to call std::cout <<\n");
+    // FIXME: this crashes if WASI has not been init correctly.
+    // host must call _start() which calls __wasi_ctors() 
     // CPP io stream test
     std::cout << "wasm/ CPP plugin_start\n";
     std::flush( std::cout );
