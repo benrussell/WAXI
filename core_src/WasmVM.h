@@ -40,9 +40,10 @@ public:
 
 		m_store = new wasmtime::Store(engine);
 
+		const std::string cwd = std::filesystem::current_path();
 
-		std::cout << "host/ cwd: " << std::filesystem::current_path() << std::endl;
-		std::cout << "host/ vfs_root: " << std::filesystem::current_path() << "/vfs_root" << std::endl;
+		std::cout << "host/ cwd: " << cwd << std::endl;
+		std::cout << "host/ vfs_root: " << cwd << "/vfs_root" << std::endl;
 		std::cout << "host/ Init WASI\n";
 		WasiConfig wasi;
 		wasi.inherit_argv();
