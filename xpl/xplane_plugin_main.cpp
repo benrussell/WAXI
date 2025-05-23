@@ -6,6 +6,7 @@
 
 #include "WasmVM.h"
 
+#include <map>
 
 WasmVM* global_WasmVM;
 
@@ -72,15 +73,50 @@ void UnregisterFlightLoopCallback() {
 
 
 
+void resolve_paths( WasmVM_Config &config ){
 
-struct ConfigVals{
-    std::string plugin_folder;
-    std::string xp_folder;
-    std::string acf_folder;
-};
+    // Need to determine:
+    // - {plugin_root} - done    
+    {
+        char path[1024]{};
+        XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
+        //std::cout << "wasm_xpl/ plugin_path: ["<< path <<"]\n";
+
+        // Extract the folder path from the full path
+        std::string fullPath(path);
+        std::string pluginFolderName = fullPath.substr(0, fullPath.find_last_of("/\\")); //strip the plugin filename
+        pluginFolderName = pluginFolderName.substr(0, pluginFolderName.find_last_of("/\\")); //strip the os_64 leaf
+
+        config.plugin_folder = pluginFolderName;
+        //std::cout << "wasm_xpl/ plugin_folder: [" << config.plugin_folder << "]\n";
+    }
+
+    // - {xp_root}
+    {
+        char xpFolder[1024]{};
+        XPLMGetSystemPath(xpFolder);
+        std::string xpRootPath(xpFolder);
+        
+        config.xp_folder = xpRootPath;
+        //std::cout << "wasm_xpl/ xp_folder: [" << config.xp_folder << "]\n";
+    }
+    
+    // - {acf_root}
+    {
+        char acfFilename[1024]{};
+        char acfFolder[1024]{};
+        XPLMGetNthAircraftModel(0, acfFilename, acfFolder); // Get the path of the user's aircraft
+        //std::cout << "wasm_xpl/ Aircraft full path: [" << acfFilename << "]\n";
+        //std::cout << "wasm_xpl/ Aircraft API folder path: [" << acfFolder << "]\n";
+        
+        config.acf_folder = acfFolder;
+        //std::cout << "wasm_xpl/ acf_folder: [" << config.acf_folder << "]\n";
+    }
+
+}
 
 
-ConfigVals g_config;
+
 
 
 
@@ -92,58 +128,21 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     XPLMEnableFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS", 1);
     //XPLMEnableFeature("XPLM_WANTS_DATAREF_NOTIFICATIONS", 1);
 
-    
 
     // Ensure the callback is registered during plugin initialization
     // RegisterFlightLoopCallback();
 
 
-
-
-    // Need to determine:
-    // - {plugin_root} - done
-    
-    {
-        char path[1024]{};
-        XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
-        std::cout << "wasm_xpl/ plugin_path: ["<< path <<"]\n";
-
-        // Extract the folder path from the full path
-        std::string fullPath(path);
-        std::string pluginFolderName = fullPath.substr(0, fullPath.find_last_of("/\\")); //strip the plugin filename
-        pluginFolderName = pluginFolderName.substr(0, pluginFolderName.find_last_of("/\\")); //strip the os_64 leaf
-
-        g_config.plugin_folder = pluginFolderName;
-        std::cout << "wasm_xpl/ plugin_folder: [" << g_config.plugin_folder << "]\n";
-    }
-
-    // - {xp_root}
-    {
-        char xpFolder[1024]{};
-        XPLMGetSystemPath(xpFolder);
-        std::string xpRootPath(xpFolder);
-        
-        g_config.xp_folder = xpRootPath;
-        std::cout << "wasm_xpl/ xp_folder: [" << g_config.xp_folder << "]\n";
-    }
-    
-    // - {acf_root}
-    {
-        char acfFilename[1024]{};
-        char acfFolder[1024]{};
-        XPLMGetNthAircraftModel(0, acfFilename, acfFolder); // Get the path of the user's aircraft
-        //std::cout << "wasm_xpl/ Aircraft full path: [" << acfFilename << "]\n";
-        //std::cout << "wasm_xpl/ Aircraft API folder path: [" << acfFolder << "]\n";
-        
-        g_config.acf_folder = acfFolder;
-        std::cout << "wasm_xpl/ acf_folder: [" << g_config.acf_folder << "]\n";
-    }
+    WasmVM_Config config;
+    resolve_paths( config );
 
 
     //FIXME: wasm filename? config.json entry?
     //std::string filename = acfFolderPath + "/wasm_plugin_basic.wasm";
-    std::string wasm_filename = "/home/br/Dev/wasm/wasm_xpl/examples/wasm_plugin_basic/build/wasm_plugin_basic.wasm";
-    global_WasmVM = new WasmVM( wasm_filename );
+    std::string wasm_filename = "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm";
+    std::cout << "wasm_xpl/ wasm filename:[" << wasm_filename << "]\n";
+    global_WasmVM = new WasmVM( wasm_filename, config );
+
 
     // These values should be over-written by the call to plugin_start()
     strncpy(outName, "WASM Plugin Shim", 255);
