@@ -42,16 +42,16 @@ static uint64_t msg_counter = 0;
 
 
 void test_cbf(){
-    printf("wasm: test_cbf() exec!\n");
+    printf("wasm/ test_cbf() exec!\n");
 }
 
 void test_cbf2(){
-    printf("wasm: test_cbf2() exec!&******************\n");
+    printf("wasm/ test_cbf2() exec!&******************\n");
 }
 
 
 void test_cmds(){
-    printf("wasm/ cmd test\n");
+    printf("wasm/ test_cmds()\n");
     auto cmdh_b = cmd_find("cmd/b");
     auto cmdh_c = cmd_find("cmd/c");
     cmd_begin(cmdh_c);
@@ -60,15 +60,15 @@ void test_cmds(){
 }
 
 void test_drefs(){
-    printf("wasm/ Running basic dataref tests..\n");
+    printf("wasm/ test_drefs()\n");
 
     {
         int32_t drh = dref_find("dref/a");
         float val_before = dref_getFloat( drh );
         dref_setFloat( drh, 1.23 );
         float val_after = dref_getFloat( drh );
-        printf("  wasm/ dref_getFloat(a) before: %f\n", val_before);
-        printf("  wasm/ dref_getFloat(a) after: %f\n", val_after);
+        printf("wasm/   dref_getFloat(a) before: %f\n", val_before);
+        printf("wasm/   dref_getFloat(a) after: %f\n", val_after);
     }
 
     {
@@ -76,8 +76,8 @@ void test_drefs(){
         float val_before = dref_getFloat( drh );
         dref_setFloat( drh, 9.23 );
         float val_after = dref_getFloat( drh );
-        printf("  wasm/ dref_getFloat(b) before: %f\n", val_before);
-        printf("  wasm/ dref_getFloat(b) after: %f\n", val_after);
+        printf("wasm/   dref_getFloat(b) before: %f\n", val_before);
+        printf("wasm/   dref_getFloat(b) after: %f\n", val_after);
     }
 
     int32_t drh = dref_find("dref/_invalid");
@@ -96,7 +96,7 @@ struct some_str{
 
 
 int main(void){
-    printf("main is required by WASI _start()\n");
+    printf("wasm/ main() is required by WASI _start()\n");
     return 0;
 }
 
@@ -107,7 +107,7 @@ int plugin_start(char* outName, char* outSig, char* outDesc) {
     // printf("wasm/ plugin_start: [%s], [%s], [%s]\n", outName, outSig, outDesc );
     //fflush( stdout );
 
-    printf("plugin_start()... about to call std::cout <<\n");
+    printf("wasm/ plugin_start()... about to call std::cout <<\n");
     // FIXME: this crashes if WASI has not been init correctly.
     // host must call _start() which calls __wasi_ctors() 
     // CPP io stream test
@@ -120,20 +120,20 @@ int plugin_start(char* outName, char* outSig, char* outDesc) {
 
     printf("wasm/ Hello World! plugin_start() is working.\n");
     
-    log_raw(" --- this is a call to XPLMDebugString from wasm byte code ---\n");
+    log_raw("wasm/ --- this is a call to XPLMDebugString from wasm byte code ---\n");
 
 
     some_str s;
     s.snafu = "situ normal";
     s.fubar = "fouled up";
-    printf("stack ptr for some_str instance: %p\n", &s);
+    printf("wasm/ stack ptr for some_str instance: %p\n", &s);
 
     some_str* ptr_s = new some_str();
-    printf("heap ptr for some_str instance: %p\n", ptr_s);
+    printf("wasm/ heap ptr for some_str instance: %p\n", ptr_s);
     delete( ptr_s );
     
     
-    printf("calling cb_reg cbf2..\n");
+    printf("wasm/ calling cb_reg cbf2..\n");
     cb_reg( (int32_t) &test_cbf2 );
     
 
@@ -175,7 +175,7 @@ int plugin_enable(){
 
     struct dirent* entry;
     while ((entry = readdir(dir)) != nullptr) {
-        printf("  %s\n", entry->d_name);
+        printf("wasm/  %s\n", entry->d_name);
     }
 
     closedir(dir);
@@ -195,7 +195,7 @@ void plugin_disable(){
 
 void plugin_message( int64_t inFromWho, int64_t inMessage, int32_t inParam ){
     
-    printf("plugin_message: from: %lld, msg: %lld, param: %i\n", inFromWho, inMessage, inParam);
+    printf("wasm/ plugin_message: from: %lld, msg: %lld, param: %i\n", inFromWho, inMessage, inParam);
     
     ++msg_counter;
 }
