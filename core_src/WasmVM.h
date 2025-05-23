@@ -113,7 +113,14 @@ public:
 		//need to load this from json?
 		VFS_record_set vfs_fstab_tpl;
 		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_root", "/") );
+
 		vfs_fstab_tpl.rs.emplace_back( VFS_record("{xp_root}", "/X-Plane") );
+		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_lock/", "/X-Plane/Aircraft") );
+		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_lock/", "/X-Plane/Resources/plugins") );
+		
+		vfs_fstab_tpl.rs.emplace_back( VFS_record("{xp_root}/{acf_root}", "/Aircraft") );
+		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_lock/", "/Aircraft/plugins") );
+		
 
 		VFS_record_set vfs_fstab;
 		
@@ -237,7 +244,7 @@ public:
 
 	void bind_wasm_exports()
 	{
-		std::cout << "host/ *** Binding WASM fn exports..\n";
+		std::cout << "host/ Binding WASM fn exports..\n";
 
 		auto find_and_save_func = [&](std::optional<wasmtime::Func> &save_to, const std::string &fn_name)
 		{
@@ -371,6 +378,9 @@ public:
 	int call_plugin_enable()
 	{
 		std::cout << "\n> host/call: plugin_enable\n";
+
+		this->set_fuel(m_fuel * 10);
+
 		auto result = m_wfn_plugin_enable.value().call(m_store, {}).unwrap();
 
 
