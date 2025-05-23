@@ -131,7 +131,7 @@ public:
 
 	void bind_wasm_exports()
 	{
-		std::cout << "Finding WASM fn exports..\n";
+		std::cout << "*** Binding WASM fn exports..\n";
 
 		auto find_and_save_func = [&](std::optional<wasmtime::Func> &save_to, const std::string &fn_name)
 		{
@@ -139,6 +139,7 @@ public:
 			if (maybe_export && std::holds_alternative<Func>(*maybe_export))
 			{
 				save_to = std::get<Func>(*maybe_export);
+				//std::cout << " - " << fn_name << "\n";
 			}
 			else
 			{
@@ -148,6 +149,7 @@ public:
 
 		// examine module exports and get handles to fns we need.
 		// - malloc / free from wasm module for memory interop.
+		find_and_save_func(m_wfn_wasi_start, "_start");
 		find_and_save_func(m_wfn_malloc, "malloc");
 		find_and_save_func(m_wfn_free, "free");
 
@@ -169,6 +171,22 @@ public:
 	{
 		// plugin start takes 3 char buffers
 		this->set_fuel(m_fuel);
+
+		{
+			std::cout << "\n> host/ calling wasi _start()\n";
+		
+			if (m_wfn_wasi_start.has_value()) {
+				auto result = m_wfn_wasi_start.value().call(m_store, {}).unwrap();
+			} else {
+				std::cout << "Error: m_wfn_wasi_start is not set.\n";
+			}
+		}
+
+
+		this->set_fuel(m_fuel);
+
+
+
 
 		// Write strings to WebAssembly memory
 		int32_t ptr_a = wasm_malloc(256);
@@ -227,7 +245,7 @@ public:
 			std::cout << "    ptr_c readback: [" << read_back << "]\n";
 		}
 
-		this->check_fuel();
+		auto lvl = this->check_fuel();
 
 		return ret;
 	}
@@ -314,6 +332,7 @@ private:
 
 	size_t m_fuel = 250'000;
 
+	std::optional<wasmtime::Func> m_wfn_wasi_start;
 	std::optional<wasmtime::Func> m_wfn_malloc;
 	std::optional<wasmtime::Func> m_wfn_free;
 
@@ -323,8 +342,9 @@ private:
 	std::optional<wasmtime::Func> m_wfn_plugin_disable;
 	std::optional<wasmtime::Func> m_wfn_plugin_message;
 
-	std::optional<wasmtime::Func> m_wfn_plugin_flcb_proxy;
+	std::optional<wasmtime::Func> m_wfn_plugin_flcb_proxy; //FIXME: might not need this, can we resolve fptr from host?
 
+	//FIXME: we prob want to store this for logging etc?
 	// These are passed back to the host caller fn.
 	// char outName[256]{};
 	// char outSig[256]{};
