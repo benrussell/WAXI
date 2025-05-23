@@ -47,9 +47,9 @@ void RegisterFlightLoopCallback() {
     flightLoopParams.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
     //flightLoopParams.phase = xplm_FlightLoop_Phase_AfterFlightModel;
 
-    printf("wasm_xpl handoff: fl_param.callbackFunc: %p\n", flightLoopParams.callbackFunc);
+    printf("wasm_xpl/ handoff: fl_param.callbackFunc: %p\n", flightLoopParams.callbackFunc);
 
-    printf(" handoff stackptr for flcb_params: %p\n", &flightLoopParams);
+    printf("wasm_xpl/ handoff stackptr for flcb_params: %p\n", &flightLoopParams);
 
     // Create the flight loop
     XPLMFlightLoopID flightLoopID = XPLMCreateFlightLoop(&flightLoopParams);
@@ -91,9 +91,13 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);
     XPLMEnableFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS", 1);
     //XPLMEnableFeature("XPLM_WANTS_DATAREF_NOTIFICATIONS", 1);
+
     
+
     // Ensure the callback is registered during plugin initialization
-    RegisterFlightLoopCallback();
+    // RegisterFlightLoopCallback();
+
+
 
 
     // Need to determine:
@@ -102,7 +106,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     {
         char path[1024]{};
         XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
-        std::cout << "wasm_xpl/ plugin info gave us path: ["<< path <<"]\n";
+        std::cout << "wasm_xpl/ plugin_path: ["<< path <<"]\n";
 
         // Extract the folder path from the full path
         std::string fullPath(path);
@@ -134,10 +138,6 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
         g_config.acf_folder = acfFolder;
         std::cout << "wasm_xpl/ acf_folder: [" << g_config.acf_folder << "]\n";
     }
-
-
-
-//README: need generic callback registration and callback with refcon    
 
 
     //FIXME: wasm filename? config.json entry?
