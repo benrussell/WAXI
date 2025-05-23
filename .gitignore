@@ -14,3 +14,7 @@ Makefile
 
 # Ignore the expanded folders. Keep the zips.
 /xpl/third_party/XPSDK410
+/xpl/third_party/glew-2.2.0
+/xpl/third_party/json-develop
+/xpl/third_party/nanovg-master
+/xpl/third_party/timer

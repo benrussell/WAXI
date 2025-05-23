@@ -5,8 +5,9 @@
 #include "XPLMPlanes.h"
 
 #include "WasmVM.h"
+#include "WasmVM_Config.h"
 
-#include <map>
+
 
 WasmVM* global_WasmVM;
 
