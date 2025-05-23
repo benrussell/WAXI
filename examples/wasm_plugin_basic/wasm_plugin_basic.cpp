@@ -12,7 +12,6 @@
 
 
 #include "host_api.h"
-//#include "host_api_dref.h"
 
 
 extern "C" {
@@ -87,6 +86,15 @@ void test_drefs(){
 
 
 
+
+struct some_str{
+    std::string snafu;
+    std::string fubar;
+};
+
+
+
+
 int main(void){
     printf("main is required by WASI _start()\n");
     return 0;
@@ -115,12 +123,19 @@ int plugin_start(char* outName, char* outSig, char* outDesc) {
     log_raw(" --- this is a call to XPLMDebugString from wasm byte code ---\n");
 
 
+    some_str s;
+    s.snafu = "situ normal";
+    s.fubar = "fouled up";
+    printf("stack ptr for some_str instance: %p\n", &s);
+
+    some_str* ptr_s = new some_str();
+    printf("heap ptr for some_str instance: %p\n", ptr_s);
+    delete( ptr_s );
     
     
     printf("calling cb_reg cbf2..\n");
     cb_reg( (int32_t) &test_cbf2 );
     
-
 
     // ret 1 to start, 0 to refuse.
     return 1;
@@ -147,6 +162,8 @@ int plugin_enable(){
 
     //test_cmds();
 
+    
+    
     // List all files in the current folder using filesystem APIs
     printf("wasm/ Listing files in the current folder:\n");
 
@@ -163,8 +180,6 @@ int plugin_enable(){
 
     closedir(dir);
     
-
-
 
 
     return msg_counter;
