@@ -1,6 +1,14 @@
-# wasm_host_xpl - WASM host for X-Plane
+# wasm_host_xpl - WASM for X-Plane
 
 "Make it exist first. You can make it good later."
+
+## What is WASM and why do I care?
+WebAssembly (WASM) is a binary instruction format for a stack-based virtual machine, designed for safe and efficient execution.
+
+- High performance due to near-native execution speeds.
+- Sandboxed memory ensures that crashes are contained within the WebAssembly module, preventing them from affecting the host application.
+- Sandboxed file I/O protects user data by restricting access to only explicitly allowed files and directories.
+- Cross-platform compatibility ensures plugins work on multiple operating systems.
 
 
 ## Building this plugin
