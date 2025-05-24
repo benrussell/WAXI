@@ -3,6 +3,8 @@
     "sig": "wasm_xpl/template_sig",
     "desc": "wasm_xpl config example",
 
+    "wasm_filename": "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm",
+
     "vfs":[
         ["{plugin_root}/vfs_root/", "/"],
 
