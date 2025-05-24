@@ -247,7 +247,9 @@ public:
 		wasm_free(ptr_b);
 		wasm_free(ptr_c);
 
+
 		// DEBUG: Testing use-after-free behaviour. WASM does not clear up old buffers. Data can be leaked.
+		#if 0
 		{
 			char read_back[4096];
 			std::cout << "host/  Use after free test. b and c only.\n";
@@ -257,6 +259,7 @@ public:
 			wasm_strcpy_from(read_back, ptr_c);
 			std::cout << "host/    ptr_c readback: [" << read_back << "]\n";
 		}
+		#endif
 
 		auto lvl = this->check_fuel();
 
