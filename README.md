@@ -1,20 +1,17 @@
-wasm_xpl is a WASM host plugin for X-Plane.
+# wasm_host_xpl - WASM host for X-Plane
 
-It allows core plugin logic to be distributed as WASM byte-code.
-
-It provides a batteries-included API to make developing plugins easier.
-
-Designed and Implemented by Ben Russell - br@x-plugins.com
-
-github.com/benrussell/
-
-(C) 2025
+"Make it exist first. You can make it good later."
 
 
+## Building this plugin
 You will need wasmtime sources to build the WASM host plugin project.
-Pre-build binaries will be made available.
+
+Pre-built binaries will be made available.
 
 
-You will need clang and the clang WASI SDK extensions to build compliant WASM plugins.
+## Compiling your code into WASM
+You will need clang and the clang WASI SDK extensions to compile to WASM byte code.
 
-See the examples folder for more info regarding client code.
+See the [wasm_plugin](https://github.com/benrussell/wasm_plugin) project for more information.
+
+
