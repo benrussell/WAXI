@@ -95,9 +95,12 @@ class WasiVfsMap{
 				std::cout << "wasm_xpl/ Loaded configuration from config.json\n";
 			} catch (const std::exception &e) {
 				std::cerr << "wasm_xpl/ Error parsing config.json: " << e.what() << "\n";
+				throw std::runtime_error(std::string("wasm_xpl/ Error parsing config.json: ") + e.what());
+				
 			}
 		} else {
 			std::cerr << "wasm_xpl/ Could not open config.json\n";
+			throw std::runtime_error("wasm_xpl/ Could not open config.json\n");
 		}
 
 		
