@@ -89,7 +89,7 @@ void resolve_paths( WasmVM_Config &config ){
         pluginFolderName = pluginFolderName.substr(0, pluginFolderName.find_last_of("/\\")); //strip the os_64 leaf
 
         config.plugin_folder = pluginFolderName;
-        //std::cout << "wasm_xpl/ plugin_folder: [" << config.plugin_folder << "]\n";
+        std::cout << "wasm_xpl/ plugin_folder: [" << config.plugin_folder << "]\n";
     }
 
     // - {xp_root}
@@ -99,7 +99,7 @@ void resolve_paths( WasmVM_Config &config ){
         std::string xpRootPath(xpFolder);
         
         config.xp_folder = xpRootPath;
-        //std::cout << "wasm_xpl/ xp_folder: [" << config.xp_folder << "]\n";
+        std::cout << "wasm_xpl/ xp_folder: [" << config.xp_folder << "]\n";
     }
     
     // - {acf_root}
@@ -111,7 +111,7 @@ void resolve_paths( WasmVM_Config &config ){
         //std::cout << "wasm_xpl/ Aircraft API folder path: [" << acfFolder << "]\n";
         
         config.acf_folder = acfFolder;
-        //std::cout << "wasm_xpl/ acf_folder: [" << config.acf_folder << "]\n";
+        std::cout << "wasm_xpl/ acf_folder: [" << config.acf_folder << "]\n";
     }
 
 }
@@ -141,9 +141,11 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
 
     std::string wasm_filename;
 
+    std::string config_json_filename = config.plugin_folder + "/config.json";
+    std::cout << "wasm_xpl/ dyn config json fn: " + config_json_filename + "\n";
 
     // Load configuration from config.json
-    std::ifstream configFile("/home/br/Dev/wasm/wasm_host_xpl/xpl/xplane_plugin_tpl/config.json");
+    std::ifstream configFile(config_json_filename);
     if (configFile.is_open()) {
         try {
             nlohmann::json jsonConfig;

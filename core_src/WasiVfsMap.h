@@ -15,6 +15,10 @@
 struct VFS_record{
 	std::string target;
 	std::string mount;
+
+	// Constructor to initialize target and mount
+	VFS_record(const std::string& target, const std::string& mount)
+		: target(target), mount(mount) {}
 };
 
 struct VFS_record_set{
@@ -60,18 +64,42 @@ class WasiVfsMap{
 
 
 
-		
-
 		//need to load this from json?
 		VFS_record_set vfs_fstab_tpl;
-		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_root", "/") );
-
-		vfs_fstab_tpl.rs.emplace_back( VFS_record("{xp_root}", "/X-Plane") );
-		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_lock/", "/X-Plane/Aircraft") );
-		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_lock/", "/X-Plane/Resources/plugins") );
 		
-		vfs_fstab_tpl.rs.emplace_back( VFS_record("{xp_root}/{acf_root}", "/Aircraft") );
-		vfs_fstab_tpl.rs.emplace_back( VFS_record("{plugin_root}/vfs_lock/", "/Aircraft/plugins") );
+
+		std::string config_json_filename = path_config.plugin_folder + "/config.json";
+		std::cout << "wasm_xpl/ WasiVfsMap/ dyn config json fn: " + config_json_filename + "\n";
+
+		// Load configuration from config.json
+		std::ifstream configFile(config_json_filename);
+		if (configFile.is_open()) {
+			try {
+				nlohmann::json jsonConfig;
+				configFile >> jsonConfig;
+				if (jsonConfig.contains("vfs") && jsonConfig["vfs"].is_array()) {
+					for (const auto& vfs_entry : jsonConfig["vfs"]) {
+						if (vfs_entry.is_array() && vfs_entry.size() == 2) {
+							std::string target = vfs_entry[0].get<std::string>();
+							std::string mount = vfs_entry[1].get<std::string>();
+							vfs_fstab_tpl.rs.emplace_back(VFS_record(target, mount));
+						} else {
+							std::cerr << "wasm_xpl/ Invalid VFS entry format in config.json\n";
+						}
+					}
+				} else {
+					throw std::runtime_error("wasm_xpl/ Missing or invalid 'vfs' definition in config.json");
+				}
+
+
+				std::cout << "wasm_xpl/ Loaded configuration from config.json\n";
+			} catch (const std::exception &e) {
+				std::cerr << "wasm_xpl/ Error parsing config.json: " << e.what() << "\n";
+			}
+		} else {
+			std::cerr << "wasm_xpl/ Could not open config.json\n";
+		}
+
 		
 
 		VFS_record_set vfs_fstab;
