@@ -1,8 +1,8 @@
 
-#include "XPLMPlugin.h"
-#include "XPLMProcessing.h"
-#include "XPLMUtilities.h"
-#include "XPLMPlanes.h"
+#include <XPLMPlugin.h>
+#include <XPLMProcessing.h>
+#include <XPLMUtilities.h>
+#include <XPLMPlanes.h>
 
 #include "WasmVM.h"
 #include "WasmVM_Config.h"
@@ -143,7 +143,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
 
 
     // Load configuration from config.json
-    std::ifstream configFile("/home/br/Dev/wasm/wasm_xpl/xpl/xplane_plugin_tpl/config.json");
+    std::ifstream configFile("/home/br/Dev/wasm/wasm_host_xpl/xpl/xplane_plugin_tpl/config.json");
     if (configFile.is_open()) {
         try {
             nlohmann::json jsonConfig;
