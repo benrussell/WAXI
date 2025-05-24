@@ -3,6 +3,18 @@
 project(wasm_xpl_plugin)
 
 
+
+
+
+
+set( INC_JSON 
+        third_party/json-develop/include
+)
+
+
+
+
+
 # Common defines needed for XPLM_SDK v4 on Linux
 add_definitions(-DXPLM200=1 -DXPLM210=1 -DXPLM300=1 -DXPLM301=1 -DXPLM400=1)
 
@@ -21,6 +33,7 @@ set( LIB_XPLANE_SDK third_party/XPSDK410/Libraries/Lin )
 
 
 include_directories(
+        ${INC_JSON}
         ${INC_XPLANE_SDK}
         ${INC_WASM_XPL_CORE}
 )

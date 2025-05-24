@@ -12,7 +12,7 @@
 WasmVM* global_WasmVM;
 
 
-
+#include <nlohmann/json.hpp>
 
 
 
@@ -138,9 +138,52 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     resolve_paths( config );
 
 
+
+    std::string wasm_filename;
+
+
+    // Load configuration from config.json
+    std::ifstream configFile("/home/br/Dev/wasm/wasm_xpl/xpl/xplane_plugin_tpl/config.json");
+    if (configFile.is_open()) {
+        try {
+            nlohmann::json jsonConfig;
+            configFile >> jsonConfig;
+
+
+            // // Example: Parse some configuration values
+            // if (jsonConfig.contains("plugin_folder")) {
+            //     config.plugin_folder = jsonConfig["plugin_folder"].get<std::string>();
+            // }
+            // if (jsonConfig.contains("xp_folder")) {
+            //     config.xp_folder = jsonConfig["xp_folder"].get<std::string>();
+            // }
+            // if (jsonConfig.contains("acf_folder")) {
+            //     config.acf_folder = jsonConfig["acf_folder"].get<std::string>();
+            // }
+
+            
+            if (jsonConfig.contains("wasm_filename")) {
+                wasm_filename = jsonConfig["wasm_filename"].get<std::string>();
+                
+            }
+
+            
+
+
+            std::cout << "wasm_xpl/ Loaded configuration from config.json\n";
+        } catch (const std::exception &e) {
+            std::cerr << "wasm_xpl/ Error parsing config.json: " << e.what() << "\n";
+        }
+    } else {
+        std::cerr << "wasm_xpl/ Could not open config.json\n";
+    }
+
+
+
+
     //FIXME: wasm filename? config.json entry?
     //std::string filename = acfFolderPath + "/wasm_plugin_basic.wasm";
-    std::string wasm_filename = "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm";
+    // std::string wasm_filename = "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm";
     std::cout << "wasm_xpl/ wasm filename:[" << wasm_filename << "]\n";
     global_WasmVM = new WasmVM( wasm_filename, config );
 

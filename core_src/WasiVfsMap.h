@@ -9,6 +9,9 @@
 #include <wasmtime.hh>
 
 
+#include <nlohmann/json.hpp>
+
+
 struct VFS_record{
 	std::string target;
 	std::string mount;
@@ -53,6 +56,11 @@ class WasiVfsMap{
             - {acf_root}
         */
 
+
+
+
+
+		
 
 		//need to load this from json?
 		VFS_record_set vfs_fstab_tpl;
