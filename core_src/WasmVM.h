@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iomanip>
 
+
 #include "xp_api/xp_api.h"
 
 using namespace wasmtime;
@@ -48,6 +49,8 @@ public:
 		wasmtime::Engine engine(std::move(config));
 
 		m_store = new wasmtime::Store(engine);
+		m_store->context().set_data((void*)m_store);
+		printf("WasmVM ctor: m_store ptr: %p\n", m_store);
 
 		const std::string cwd = std::filesystem::current_path();
 
