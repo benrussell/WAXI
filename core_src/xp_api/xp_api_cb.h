@@ -56,9 +56,9 @@ class cb {
 public:
 	static std::vector<wasm_cb_wrap*> callbacks;
 
-	static int64_t reg(wasmtime::Caller caller, int32_t idx)
+	static int64_t reg(wasmtime::Caller caller, int32_t idx, int32_t wasm_refcon)
 	{
-		std::cout << ">> api/ cb_reg(" << idx << ")\n";
+		std::cout << ">> api/ cb_reg(" << idx << ", " << wasm_refcon << ")\n";
 
 		auto store_data_any = caller.context().get_data();
 		auto raw_store_data_ptr = store_data_any.has_value() && store_data_any.type() == typeid(void*)
@@ -70,6 +70,7 @@ public:
 
         auto* store_ptr = (wasmtime::Store*)raw_store_data_ptr;
         printf("xp_api::cb::reg/ store_ptr: %p\n", store_ptr);
+        printf("xp_api::cb::reg/ wasm_refcon: %p\n", wasm_refcon);
 
 
         auto tbl_any = caller.get_export("__indirect_function_table");
@@ -81,7 +82,7 @@ public:
 		if (!func_opt) throw std::runtime_error("index not a funcref");
 
 
-		callbacks.emplace_back(new wasm_cb_wrap(store_ptr, *func_opt, 0xABCD));
+		callbacks.emplace_back(new wasm_cb_wrap(store_ptr, *func_opt, wasm_refcon));
 		return callbacks.size();
 	}
 
