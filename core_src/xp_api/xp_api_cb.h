@@ -38,8 +38,9 @@ public:
 		std::vector<wasmtime::Val> args = {
 			dt, dt_fl, counter, int32_t(m_refcon)
 		};
-		m_func.call(ctx, args).unwrap();
-		return 1.0f;
+        auto result = m_func.call(ctx, args).unwrap();
+        float ret = result[0].f32();
+		return ret;
 	}
 
 	static float xplane_flcb_handler(float dt,float dt_fl,int counter,void* ref)
