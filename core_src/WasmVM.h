@@ -288,6 +288,9 @@ public:
 		auto result = m_wfn_plugin_enable.value().call(m_store, {}).unwrap();
 
 
+
+
+#if 0
 								// --- FLCB fixed call hack
 								// --- FLCB fixed call hack
 								// --- FLCB fixed call hack
@@ -301,7 +304,7 @@ public:
 									wasmtime::Val(xp_api::cb::glob_cbf_ptr)
 									}
 								).unwrap();
-								
+#endif								
 
 
 

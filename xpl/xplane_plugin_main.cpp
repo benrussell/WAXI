@@ -15,7 +15,7 @@ WasmVM* global_WasmVM;
 #include <nlohmann/json.hpp>
 
 
-
+#if 0
 // Flight loop callback function
 float CustomFlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
     // Custom logic for the flight loop callback
@@ -71,7 +71,7 @@ void RegisterFlightLoopCallback() {
 void UnregisterFlightLoopCallback() {
     //XPLMUnregisterFlightLoopCallback(CustomFlightLoopCallback, nullptr);
 }
-
+#endif
 
 
 void resolve_paths( WasmVM_Config &config ){
