@@ -34,12 +34,12 @@ float CustomFlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTime
 
 // Register the flight loop callback
 void RegisterFlightLoopCallback() {
-    std::cout << "wasm_xpl/ registering flcb\n";
+    std::cout << "wasm_host_xpl/ registering flcb\n";
     //XPLMRegisterFlightLoopCallback(CustomFlightLoopCallback, 1.0f, nullptr); // Initial interval of 1 second
 
 
     // Output the pointer address of CustomFlightLoopCallback as a decimal value
-    printf("wasm_xpl/ flcb ptr: %p\n", &CustomFlightLoopCallback);
+    printf("wasm_host_xpl/ flcb ptr: %p\n", &CustomFlightLoopCallback);
 
     // Create a flight loop structure
     XPLMCreateFlightLoop_t flightLoopParams;
@@ -49,9 +49,9 @@ void RegisterFlightLoopCallback() {
     flightLoopParams.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
     //flightLoopParams.phase = xplm_FlightLoop_Phase_AfterFlightModel;
 
-    printf("wasm_xpl/ handoff: fl_param.callbackFunc: %p\n", flightLoopParams.callbackFunc);
+    printf("wasm_host_xpl/ handoff: fl_param.callbackFunc: %p\n", flightLoopParams.callbackFunc);
 
-    printf("wasm_xpl/ handoff stackptr for flcb_params: %p\n", &flightLoopParams);
+    printf("wasm_host_xpl/ handoff stackptr for flcb_params: %p\n", &flightLoopParams);
 
     // Create the flight loop
     XPLMFlightLoopID flightLoopID = XPLMCreateFlightLoop(&flightLoopParams);
@@ -81,7 +81,7 @@ void resolve_paths( WasmVM_Config &config ){
     {
         char path[1024]{};
         XPLMGetPluginInfo(XPLMGetMyID(), nullptr, path, nullptr, nullptr);
-        //std::cout << "wasm_xpl/ plugin_path: ["<< path <<"]\n";
+        //std::cout << "wasm_host_xpl/ plugin_path: ["<< path <<"]\n";
 
         // Extract the folder path from the full path
         std::string fullPath(path);
@@ -89,7 +89,7 @@ void resolve_paths( WasmVM_Config &config ){
         pluginFolderName = pluginFolderName.substr(0, pluginFolderName.find_last_of("/\\")); //strip the os_64 leaf
 
         config.plugin_folder = pluginFolderName;
-        std::cout << "wasm_xpl/ plugin_folder: [" << config.plugin_folder << "]\n";
+        std::cout << "wasm_host_xpl/ plugin_folder: [" << config.plugin_folder << "]\n";
     }
 
     // - {xp_root}
@@ -99,7 +99,7 @@ void resolve_paths( WasmVM_Config &config ){
         std::string xpRootPath(xpFolder);
         
         config.xp_folder = xpRootPath;
-        std::cout << "wasm_xpl/ xp_folder: [" << config.xp_folder << "]\n";
+        std::cout << "wasm_host_xpl/ xp_folder: [" << config.xp_folder << "]\n";
     }
     
     // - {acf_root}
@@ -107,11 +107,11 @@ void resolve_paths( WasmVM_Config &config ){
         char acfFilename[1024]{};
         char acfFolder[1024]{};
         XPLMGetNthAircraftModel(0, acfFilename, acfFolder); // Get the path of the user's aircraft
-        //std::cout << "wasm_xpl/ Aircraft full path: [" << acfFilename << "]\n";
-        //std::cout << "wasm_xpl/ Aircraft API folder path: [" << acfFolder << "]\n";
+        //std::cout << "wasm_host_xpl/ Aircraft full path: [" << acfFilename << "]\n";
+        //std::cout << "wasm_host_xpl/ Aircraft API folder path: [" << acfFolder << "]\n";
         
         config.acf_folder = acfFolder;
-        std::cout << "wasm_xpl/ acf_folder: [" << config.acf_folder << "]\n";
+        std::cout << "wasm_host_xpl/ acf_folder: [" << config.acf_folder << "]\n";
     }
 
 }
@@ -142,7 +142,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     std::string wasm_filename;
 
     std::string config_json_filename = config.plugin_folder + "/config.json";
-    std::cout << "wasm_xpl/ dyn config json fn: " + config_json_filename + "\n";
+    std::cout << "wasm_host_xpl/ dyn config json fn: " + config_json_filename + "\n";
 
     // Load configuration from config.json
     std::ifstream configFile(config_json_filename);
@@ -172,12 +172,12 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
             
 
 
-            std::cout << "wasm_xpl/ Loaded configuration from config.json\n";
+            std::cout << "wasm_host_xpl/ Loaded configuration from config.json\n";
         } catch (const std::exception &e) {
-            std::cerr << "wasm_xpl/ Error parsing config.json: " << e.what() << "\n";
+            std::cerr << "wasm_host_xpl/ Error parsing config.json: " << e.what() << "\n";
         }
     } else {
-        std::cerr << "wasm_xpl/ Could not open config.json\n";
+        std::cerr << "wasm_host_xpl/ Could not open config.json\n";
     }
 
 
@@ -186,7 +186,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     //FIXME: wasm filename? config.json entry?
     //std::string filename = acfFolderPath + "/wasm_plugin_basic.wasm";
     // std::string wasm_filename = "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm";
-    std::cout << "wasm_xpl/ wasm filename:[" << wasm_filename << "]\n";
+    std::cout << "wasm_host_xpl/ wasm filename:[" << wasm_filename << "]\n";
     global_WasmVM = new WasmVM( wasm_filename, config );
 
 
@@ -198,11 +198,11 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     // The outName, outSig, and outDesc buffers are guaranteed to be at least 256 bytes each.
     // Reference: X-Plane SDK documentation.
 
-    //XPLMDebugString("wasm_xpl/ Calling into wasm start...\n");
+    //XPLMDebugString("wasm_host_xpl/ Calling into wasm start...\n");
     int wasm_ret = global_WasmVM->call_plugin_start( outName, outSig, outDesc );
     
     
-    XPLMDebugString("wasm_xpl/ Plugin started...\n");
+    XPLMDebugString("wasm_host_xpl/ Plugin started...\n");
 
     return wasm_ret;
 }

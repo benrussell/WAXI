@@ -37,9 +37,9 @@ class WasiVfsMap{
         WasiConfig* wasi
     ){
 
-		std::cout << "host/ path_config.plugin_folder: " << path_config.plugin_folder << std::endl;
-		std::cout << "host/ path_config.xp_folder: " << path_config.xp_folder << std::endl;
-		std::cout << "host/ path_config.acf_folder: " << path_config.acf_folder << std::endl;
+		std::cout << "wasm_host/ path_config.plugin_folder: " << path_config.plugin_folder << std::endl;
+		std::cout << "wasm_host/ path_config.xp_folder: " << path_config.xp_folder << std::endl;
+		std::cout << "wasm_host/ path_config.acf_folder: " << path_config.acf_folder << std::endl;
 
         /*
         VFS definition in the config.json looks like this:
@@ -69,7 +69,7 @@ class WasiVfsMap{
 		
 
 		std::string config_json_filename = path_config.plugin_folder + "/config.json";
-		std::cout << "wasm_xpl/ WasiVfsMap/ dyn config json fn: " + config_json_filename + "\n";
+		std::cout << "wasm_host_xpl/ WasiVfsMap/ dyn config json fn: " + config_json_filename + "\n";
 
 		// Load configuration from config.json
 		std::ifstream configFile(config_json_filename);
@@ -84,23 +84,23 @@ class WasiVfsMap{
 							std::string mount = vfs_entry[1].get<std::string>();
 							vfs_fstab_tpl.rs.emplace_back(VFS_record(target, mount));
 						} else {
-							std::cerr << "wasm_xpl/ Invalid VFS entry format in config.json\n";
+							std::cerr << "wasm_host_xpl/ Invalid VFS entry format in config.json\n";
 						}
 					}
 				} else {
-					throw std::runtime_error("wasm_xpl/ Missing or invalid 'vfs' definition in config.json");
+					throw std::runtime_error("wasm_host_xpl/ Missing or invalid 'vfs' definition in config.json");
 				}
 
 
-				std::cout << "wasm_xpl/ Loaded configuration from config.json\n";
+				std::cout << "wasm_host_xpl/ Loaded configuration from config.json\n";
 			} catch (const std::exception &e) {
-				std::cerr << "wasm_xpl/ Error parsing config.json: " << e.what() << "\n";
-				throw std::runtime_error(std::string("wasm_xpl/ Error parsing config.json: ") + e.what());
+				std::cerr << "wasm_host_xpl/ Error parsing config.json: " << e.what() << "\n";
+				throw std::runtime_error(std::string("wasm_host_xpl/ Error parsing config.json: ") + e.what());
 				
 			}
 		} else {
-			std::cerr << "wasm_xpl/ Could not open config.json\n";
-			throw std::runtime_error("wasm_xpl/ Could not open config.json\n");
+			std::cerr << "wasm_host_xpl/ Could not open config.json\n";
+			throw std::runtime_error("wasm_host_xpl/ Could not open config.json\n");
 		}
 
 		
@@ -129,10 +129,10 @@ class WasiVfsMap{
 
         // call wasi with preopen_dir calls
 		for (const auto &record : vfs_fstab.rs) {
-			std::cout << "host/ VFS: " << record.target << " -> " << record.mount << std::endl;
+			std::cout << "wasm_host/ VFS: " << record.target << " -> " << record.mount << std::endl;
 
 			if( ! wasi->preopen_dir(record.target, record.mount) ){
-				std::cout << "host/ ERROR: Failed to open VFS folder.\n";
+				std::cout << "wasm_host/ ERROR: Failed to open VFS folder.\n";
 				//exit(1); //FIXME: we should probably error out if something fails.
 			}			
 		}

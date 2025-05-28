@@ -54,8 +54,8 @@ public:
 
 		const std::string cwd = std::filesystem::current_path();
 
-		std::cout << "host/ cwd: " << cwd << std::endl;
-		std::cout << "host/ Init WASI\n";
+		std::cout << "wasm_host/ cwd: " << cwd << std::endl;
+		std::cout << "wasm_host/ Init WASI\n";
 		WasiConfig wasi;
 		wasi.inherit_argv();
 		wasi.inherit_env();
@@ -81,7 +81,7 @@ public:
 		std::vector<uint8_t> wasm_bytes = this->read_file(filename);
 
 		// Compile and instantiate the module
-		std::cout << "host/ Compiling user WASM\n";
+		std::cout << "wasm_host/ Compiling user WASM\n";
 		auto module = wasmtime::Module::compile(engine, wasm_bytes).unwrap();
 		//    if (!module) {
 		//        std::cerr << "Failed to create module" << std::endl;
@@ -103,7 +103,7 @@ public:
 		// // No extra options are needed unless you want to override the module's memory definition.
 		//     auto& memory = custom_mem;
 
-		std::cout << "host/ Instantiate blob.wasm\n";
+		std::cout << "wasm_host/ Instantiate blob.wasm\n";
 		m_instance = new wasmtime::Instance(linker.instantiate(m_store, module).unwrap());
 		//    if (!instance) {
 		//        std::cerr << "Failed to instantiate module" << std::endl;
@@ -111,21 +111,21 @@ public:
 		//        std::cerr << "Error message: " << error.message() << std::endl;
 		//        return 1;
 		//    }
-		std::cout << "host/   Success\n";
+		std::cout << "wasm_host/   Success\n";
 
-		std::cout << "host/ Finding WASM memory export..\n";
+		std::cout << "wasm_host/ Finding WASM memory export..\n";
 		// Extract the memory from the instance
 		auto memor = m_instance->get(m_store, "memory"); // FIXME: ptr deref?
 		if (!memor)
 		{
-			throw std::runtime_error("host/ Failed to find 'memory' resource");
+			throw std::runtime_error("wasm_host/ Failed to find 'memory' resource");
 		}
 		m_memory = std::get<Memory>(*memor);
 
 		auto mem_size_pages = m_memory->size(m_store);
-		std::cout << "host/         size now (pages): " << mem_size_pages << "\n";
+		std::cout << "wasm_host/         size now (pages): " << mem_size_pages << "\n";
 		auto mem_size_kb = (mem_size_pages * 64);
-		std::cout << "host/         size now (kilobytes): " << mem_size_kb << " KB\n";
+		std::cout << "wasm_host/         size now (kilobytes): " << mem_size_kb << " KB\n";
 
 		// find plugin_start,stop,enable,etc
 		this->bind_wasm_exports();
@@ -148,7 +148,7 @@ public:
 
 	void bind_wasm_exports()
 	{
-		std::cout << "host/ Binding WASM fn exports..\n";
+		std::cout << "wasm_host/ Binding WASM fn exports..\n";
 
 		auto find_and_save_func = [&](std::optional<wasmtime::Func> &save_to, const std::string &fn_name)
 		{
@@ -160,7 +160,7 @@ public:
 			}
 			else
 			{
-				std::cout << "host/  * Warning: " << fn_name << " not found.\n";
+				std::cout << "wasm_host/  * Warning: " << fn_name << " not found.\n";
 			}
 		};
 
@@ -192,12 +192,12 @@ public:
 		// WASI start call.
 		{
 			this->set_fuel(m_fuel);
-			std::cout << "\n> host/ calling wasi _start()\n";
+			std::cout << "\n> wasm_host/ calling wasi _start()\n";
 		
 			if (m_wfn_wasi_start.has_value()) {
 				auto result = m_wfn_wasi_start.value().call(m_store, {}).unwrap();
 			} else {
-				std::cout << "host/ Error: m_wfn_wasi_start is not set.\n";
+				std::cout << "wasm_host/ Error: m_wfn_wasi_start is not set.\n";
 			}
 		}
 
@@ -220,14 +220,14 @@ public:
 			wasmtime::Val(ptr_b),
 			wasmtime::Val(ptr_c)};
 
-		std::cout << "\n> host/ calling plugin_start(a,b,c)\n";
+		std::cout << "\n> wasm_host/ calling plugin_start(a,b,c)\n";
 		auto result = m_wfn_plugin_start.value().call(m_store, args).unwrap();
 
 		int ret = 0;
 		{
 			// fflush( stdout );
-			// std::cout << "> host/plugin_start returned, result count: " << result.size() << "\n";
-			std::cout << "> host/ plugin_start returned: " << result[0].i32() << std::endl;
+			// std::cout << "> wasm_host/plugin_start returned, result count: " << result.size() << "\n";
+			std::cout << "> wasm_host/ plugin_start returned: " << result[0].i32() << std::endl;
 			ret = result[0].i32();
 		}
 
@@ -242,7 +242,7 @@ public:
 		}
 		else
 		{
-			std::cout << "> host/ WASM module refused to start.\n";
+			std::cout << "> wasm_host/ WASM module refused to start.\n";
 		}
 
 		// MUST free resources - these calls count twd fuel usage!
@@ -255,12 +255,12 @@ public:
 		#if 0
 		{
 			char read_back[4096];
-			std::cout << "host/  Use after free test. b and c only.\n";
+			std::cout << "wasm_host/  Use after free test. b and c only.\n";
 			// Attempt to write to ptr_a after it has been freed
 			wasm_strcpy_from(read_back, ptr_b);
-			std::cout << "host/    ptr_b readback: [" << read_back << "]\n";
+			std::cout << "wasm_host/    ptr_b readback: [" << read_back << "]\n";
 			wasm_strcpy_from(read_back, ptr_c);
-			std::cout << "host/    ptr_c readback: [" << read_back << "]\n";
+			std::cout << "wasm_host/    ptr_c readback: [" << read_back << "]\n";
 		}
 		#endif
 
@@ -274,7 +274,7 @@ public:
 
 	void call_plugin_stop()
 	{
-		std::cout << "\n> host/call: plugin_stop\n";
+		std::cout << "\n> wasm_host/call: plugin_stop\n";
 		auto result = m_wfn_plugin_stop.value().call(m_store, {}).unwrap();
 		this->check_fuel();
 	}
@@ -284,7 +284,7 @@ public:
 
 	int call_plugin_enable()
 	{
-		std::cout << "\n> host/call: plugin_enable\n";
+		std::cout << "\n> wasm_host/call: plugin_enable\n";
 
 		this->set_fuel(m_fuel * 10);
 
@@ -322,7 +322,7 @@ public:
 	void call_plugin_disable()
 	{
 
-		std::cout << "\n> host/call: plugin_disable\n";
+		std::cout << "\n> wasm_host/call: plugin_disable\n";
 		auto result = m_wfn_plugin_disable.value().call(m_store, {}).unwrap();
 		this->check_fuel();
 	}
@@ -333,7 +333,7 @@ public:
 	void call_plugin_message(int64_t inFromWho, int64_t inMessage, int32_t inParam)
 	{
 
-		// std::cout << "\n> host/call: plugin_message\n";
+		// std::cout << "\n> wasm_host/call: plugin_message\n";
 		std::vector<wasmtime::Val> args = {
 			wasmtime::Val(inFromWho),
 			wasmtime::Val(inMessage),
@@ -358,9 +358,9 @@ public:
 
 		{
 			uint64_t consumed = m_fuel - fuel_level;
-			std::cout << "host/  consumed fuel: " << consumed << "\n";
+			std::cout << "wasm_host/  consumed fuel: " << consumed << "\n";
 			double percent = (double(consumed) / double(m_fuel)) * 100.0;
-			std::cout << "host/  fuel consumed: " << std::fixed << std::setprecision(1) << percent << "%\n";
+			std::cout << "wasm_host/  fuel consumed: " << std::fixed << std::setprecision(1) << percent << "%\n";
 		}
 
 		return fuel_level;
@@ -401,17 +401,17 @@ private:
 		std::ifstream wasm_file(filename.c_str(), std::ios::binary);
 		if (!wasm_file)
 		{
-			std::cerr << "host/ Failed to open WASM file [" << filename << "]" << std::endl;
+			std::cerr << "wasm_host/ Failed to open WASM file [" << filename << "]" << std::endl;
 			// return 1;
-			throw std::runtime_error("host/ Failed to open WASM file [" + filename + "]");
+			throw std::runtime_error("wasm_host/ Failed to open WASM file [" + filename + "]");
 		}
 
 		std::vector<uint8_t> wasm_bytes((std::istreambuf_iterator<char>(wasm_file)), std::istreambuf_iterator<char>());
 		if (wasm_bytes.empty())
 		{
-			std::cerr << "host/ Failed to read WASM file" << std::endl;
+			std::cerr << "wasm_host/ Failed to read WASM file" << std::endl;
 			// return 1;
-			throw std::runtime_error("host/ Failed to read WASM file [" + filename + "]");
+			throw std::runtime_error("wasm_host/ Failed to read WASM file [" + filename + "]");
 		}
 
 		return wasm_bytes;
@@ -422,13 +422,13 @@ private:
 		// std::cout << "wasm_malloc called with size: " << size << std::endl;
 		if (!m_wfn_malloc.has_value())
 		{
-			throw std::runtime_error("host/ wasm_malloc: malloc function not found in WASM module");
+			throw std::runtime_error("wasm_host/ wasm_malloc: malloc function not found in WASM module");
 		}
 		std::vector<wasmtime::Val> args = {wasmtime::Val(size)};
 		auto result = m_wfn_malloc.value().call(m_store, args).unwrap();
 		if (result.empty())
 		{
-			throw std::runtime_error("host/ wasm_malloc: malloc returned no result");
+			throw std::runtime_error("wasm_host/ wasm_malloc: malloc returned no result");
 		}
 		// std::cout << "wasm_malloc returned ptr: " << result[0].i32() << std::endl;
 
@@ -446,7 +446,7 @@ private:
 		// std::cout << "wasm_free called with ptr: " << ptr << std::endl;
 		if (!m_wfn_free.has_value())
 		{
-			throw std::runtime_error("host/ wasm_free: free function not found in WASM module");
+			throw std::runtime_error("wasm_host/ wasm_free: free function not found in WASM module");
 		}
 
 		// Copy four zero bytes to the memory offset at ptr
@@ -457,7 +457,7 @@ private:
 		auto result = m_wfn_free.value().call(m_store, args).unwrap();
 		if (!result.empty())
 		{
-			std::cout << "host/ wasm_free returned value: " << result[0].i32() << std::endl;
+			std::cout << "wasm_host/ wasm_free returned value: " << result[0].i32() << std::endl;
 			return result[0].i32();
 		}
 		// std::cout << "wasm_free returned 0" << std::endl;
@@ -469,12 +469,12 @@ private:
 	{
 		if (!m_memory.has_value())
 		{
-			throw std::runtime_error("host/ wasm_memcpy_to: WASM memory not available");
+			throw std::runtime_error("wasm_host/ wasm_memcpy_to: WASM memory not available");
 		}
 		auto mem_data = m_memory->data(*m_store);
 		if (target_offset < 0 || target_offset + size > mem_data.size())
 		{
-			throw std::runtime_error("host/ wasm_memcpy_to: target offset/size out of bounds");
+			throw std::runtime_error("wasm_host/ wasm_memcpy_to: target offset/size out of bounds");
 		}
 		std::memcpy(mem_data.data() + target_offset, data, size);
 	}
@@ -484,12 +484,12 @@ private:
 	{
 		if (!m_memory.has_value())
 		{
-			throw std::runtime_error("host/ wasm_memcpy_from: WASM memory not available");
+			throw std::runtime_error("wasm_host/ wasm_memcpy_from: WASM memory not available");
 		}
 		auto mem_data = m_memory->data(*m_store);
 		if (target_offset < 0 || target_offset + size > mem_data.size())
 		{
-			throw std::runtime_error("host/ wasm_memcpy_from: target offset/size out of bounds");
+			throw std::runtime_error("wasm_host/ wasm_memcpy_from: target offset/size out of bounds");
 		}
 		std::memcpy(data, mem_data.data() + target_offset, size);
 	}
@@ -498,7 +498,7 @@ private:
 	{
 		if (!src)
 		{
-			throw std::runtime_error("host/ wasm_strcpy_to: src is null");
+			throw std::runtime_error("wasm_host/ wasm_strcpy_to: src is null");
 		}
 		size_t len = std::strlen(src) + 1; // include null terminator
 		this->wasm_memcpy_to(offset, (void *)src, static_cast<int32_t>(len));
@@ -508,12 +508,12 @@ private:
 	{
 		if (!m_memory.has_value())
 		{
-			throw std::runtime_error("host/ wasm_strcpy_from: WASM memory not available");
+			throw std::runtime_error("wasm_host/ wasm_strcpy_from: WASM memory not available");
 		}
 		auto mem_data = m_memory->data(*m_store);
 		if (offset < 0 || offset >= mem_data.size())
 		{
-			throw std::runtime_error("host/ wasm_strcpy_from: offset out of bounds");
+			throw std::runtime_error("wasm_host/ wasm_strcpy_from: offset out of bounds");
 		}
 
 		int32_t i = 0;
