@@ -58,8 +58,11 @@ public:
 
 	static int64_t reg(wasmtime::Caller caller, int32_t idx, int32_t wasm_refcon)
 	{
-		std::cout << ">> api/ cb_reg(" << idx << ", " << wasm_refcon << ")\n";
+		// std::cout << ">> api/ cb_reg(" << idx << ", " << wasm_refcon << ")\n";
 
+
+		//FIXME: this block of code casts via a void* 'cause I was tired of fighting the compiler.
+		// it should be improved. but it "works for now". (2025-05-28, br)
 		auto store_data_any = caller.context().get_data();
 		auto raw_store_data_ptr = store_data_any.has_value() && store_data_any.type() == typeid(void*)
 								  ? std::any_cast<void*>(store_data_any)
@@ -69,8 +72,8 @@ public:
         }
 
         auto* store_ptr = (wasmtime::Store*)raw_store_data_ptr;
-        printf("xp_api::cb::reg/ store_ptr: %p\n", store_ptr);
-        printf("xp_api::cb::reg/ wasm_refcon: %p\n", wasm_refcon);
+        //printf("xp_api::cb::reg/ store_ptr: %p\n", store_ptr);
+        // printf("xp_api::cb::reg/ wasm_refcon: %p\n", wasm_refcon);
 
 
         auto tbl_any = caller.get_export("__indirect_function_table");
@@ -86,7 +89,11 @@ public:
 		return callbacks.size();
 	}
 
-	static void unreg(wasmtime::Caller, int64_t) {/*TODO*/}
+	static void unreg(wasmtime::Caller, int64_t) {
+		/*TODO*/
+		printf("xp_api::cb::unreg NOOP\n");
+		exit(1);
+	}
 };
 std::vector<wasm_cb_wrap*> cb::callbacks;
 } // namespace xp_api
