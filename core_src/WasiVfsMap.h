@@ -37,9 +37,9 @@ class WasiVfsMap{
         WasiConfig* wasi
     ){
 
-		std::cout << "waxi/ WASI VFS {plugin_root}: " << path_config.plugin_folder << std::endl;
-		std::cout << "waxi/ WASI VFS     {xp_root}: " << path_config.xp_folder << std::endl;
-		std::cout << "waxi/ WASI VFS    {acf_root}: " << path_config.acf_folder << std::endl;
+		std::cout << "waxi/  VFS {plugin_root}: " << path_config.plugin_folder << std::endl;
+		std::cout << "waxi/  VFS     {xp_root}: " << path_config.xp_folder << std::endl;
+		std::cout << "waxi/  VFS    {acf_root}: " << path_config.acf_folder << std::endl;
 
         /*
         VFS definition in the config.json looks like this:
@@ -127,7 +127,7 @@ class WasiVfsMap{
 
         // call wasi with preopen_dir calls
 		for (const auto &record : vfs_fstab.rs) {
-			//std::cout << "waxi/ VFS: " << record.target << " -> " << record.mount << std::endl;
+			std::cout << "waxi/  VFS  " << record.target << " -> " << record.mount << std::endl;
 
 			if( ! wasi->preopen_dir(record.target, record.mount) ){
 				const std::string err_msg = "waxi/ Error failed to open VFS folder: [" + record.target + "]";
