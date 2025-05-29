@@ -37,9 +37,9 @@ class WasiVfsMap{
         WasiConfig* wasi
     ){
 
-		std::cout << "wasm_host/ path_config.plugin_folder: " << path_config.plugin_folder << std::endl;
-		std::cout << "wasm_host/ path_config.xp_folder: " << path_config.xp_folder << std::endl;
-		std::cout << "wasm_host/ path_config.acf_folder: " << path_config.acf_folder << std::endl;
+		std::cout << "wasm_host/ WASI VFS {plugin_root}: " << path_config.plugin_folder << std::endl;
+		std::cout << "wasm_host/ WASI VFS     {xp_root}: " << path_config.xp_folder << std::endl;
+		std::cout << "wasm_host/ WASI VFS    {acf_root}: " << path_config.acf_folder << std::endl;
 
         /*
         VFS definition in the config.json looks like this:
@@ -62,14 +62,12 @@ class WasiVfsMap{
 
 
 
-
-
 		//need to load this from json?
 		VFS_record_set vfs_fstab_tpl;
 		
 
 		std::string config_json_filename = path_config.plugin_folder + "/config.json";
-		std::cout << "wasm_host_xpl/ WasiVfsMap/ dyn config json fn: " + config_json_filename + "\n";
+		//std::cout << "wasm_host_xpl/ WasiVfsMap/ dyn config json fn: " + config_json_filename + "\n";
 
 		// Load configuration from config.json
 		std::ifstream configFile(config_json_filename);
@@ -92,7 +90,7 @@ class WasiVfsMap{
 				}
 
 
-				std::cout << "wasm_host_xpl/ Loaded configuration from config.json\n";
+				//std::cout << "wasm_host_xpl/ Loaded configuration from config.json\n";
 			} catch (const std::exception &e) {
 				std::cerr << "wasm_host_xpl/ Error parsing config.json: " << e.what() << "\n";
 				throw std::runtime_error(std::string("wasm_host_xpl/ Error parsing config.json: ") + e.what());
@@ -129,7 +127,7 @@ class WasiVfsMap{
 
         // call wasi with preopen_dir calls
 		for (const auto &record : vfs_fstab.rs) {
-			std::cout << "wasm_host/ VFS: " << record.target << " -> " << record.mount << std::endl;
+			//std::cout << "wasm_host/ VFS: " << record.target << " -> " << record.mount << std::endl;
 
 			if( ! wasi->preopen_dir(record.target, record.mount) ){
 				std::cout << "wasm_host/ ERROR: Failed to open VFS folder.\n";
