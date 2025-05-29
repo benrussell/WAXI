@@ -54,7 +54,7 @@ public:
 
 		const std::string cwd = std::filesystem::current_path();
 
-		std::cout << "waxi/ cwd: " << cwd << std::endl;
+		std::cout << "waxi/ WasmVM ctor cwd: " << cwd << std::endl;
 		std::cout << "waxi/ Init WASI\n";
 		WasiConfig wasi;
 		wasi.inherit_argv();
