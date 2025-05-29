@@ -15,6 +15,54 @@ WasmVM* global_WasmVM;
 #include <nlohmann/json.hpp>
 
 
+
+
+
+
+#include <XPLMDisplay.h>
+#include <GL/gl.h>
+
+// Basic Panel Phase Drawing Callback
+int PanelDrawCallback(XPLMDrawingPhase inPhase, int inIsBefore, void* inRefcon) {
+
+    //std::cout << "waxi/ panel draw callback fired..\n";
+
+    if (inPhase == xplm_Phase_Window) {
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+        // Set drawing color to green
+        glColor3f(1.0f, 0.0f, 1.0f);
+
+        // Draw a simple rectangle
+        glBegin(GL_LINE_LOOP);
+            glVertex2f(50.0f, 50.0f);
+            glVertex2f(250.0f, 50.0f);
+            glVertex2f(250.0f, 150.0f);
+            glVertex2f(50.0f, 150.0f);
+        glEnd();
+
+        glPopAttrib();
+    }
+    return 1; // Redraw every frame
+}
+
+// Register the panel draw callback
+void RegisterPanelDrawCallback() {
+    std::cout << "waxi/ proto/ register drawing cb\n";
+    XPLMRegisterDrawCallback(PanelDrawCallback, xplm_Phase_Window, 0, nullptr);
+}
+
+// Unregister the panel draw callback
+void UnregisterPanelDrawCallback() {
+    XPLMUnregisterDrawCallback(PanelDrawCallback, xplm_Phase_Window, 0, nullptr);
+}
+
+
+
+
+
+
+
 #if 0
 // Flight loop callback function
 float CustomFlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
@@ -215,6 +263,9 @@ PLUGIN_API void XPluginStop(void) {
 
 // Plugin enable function
 PLUGIN_API int XPluginEnable(void) {
+
+    RegisterPanelDrawCallback();
+
     // Code to enable the plugin
     return global_WasmVM->call_plugin_enable();;
 }
