@@ -1,4 +1,6 @@
-# wasm_host_xpl - WASM for X-Plane
+# WAXI - WebAssembly X-Plane Interface
+
+This is a small SDK layer that lets us create X-Plane plugins with WASM.
 
 "Make it exist first. You can make it good later."
 
