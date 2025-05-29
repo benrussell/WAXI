@@ -1,13 +1,13 @@
 
 
-project(wasm_xpl_cli)
+project(WAXI_cli)
 
 
-add_executable(wasm_xpl_cli
+add_executable(WAXI_cli
         main.cpp
         )
 
-target_link_libraries( wasm_xpl_cli  ${USE_LIBS} )
+target_link_libraries( WAXI_cli  ${USE_LIBS} )
 
 
 

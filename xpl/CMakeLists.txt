@@ -1,17 +1,14 @@
 
+# Build the X-Plane plugin.
+# Currently works on Linux Mint 21.
+# Output filename is libWAXI_xpl.so
 
-project(wasm_xpl_plugin)
-
-
-
-
+project(WAXI_xpl)
 
 
 set( INC_JSON 
         third_party/json-develop/include
 )
-
-
 
 
 
@@ -40,16 +37,13 @@ include_directories(
 
 
 
-
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_library(wasm_xpl_plugin SHARED
+add_library(WAXI_xpl SHARED
         xplane_plugin_main.cpp
         )
 
 
-target_link_libraries( wasm_xpl_plugin  ${USE_LIBS} )
-
+target_link_libraries( WAXI_xpl  ${USE_LIBS} )
 
 
