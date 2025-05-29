@@ -80,9 +80,10 @@ public:
 
 		// Load the WASM module
 		std::vector<uint8_t> wasm_bytes = this->read_file(filename);
+		std::cout << "waxi/ Read WASM blob: [" << filename << "]\n";
 
 		// Compile and instantiate the module
-		std::cout << "waxi/ Compiling user WASM\n";
+		std::cout << "waxi/ Compiling WASM blob..\n";
 		auto module = wasmtime::Module::compile(engine, wasm_bytes).unwrap();
 		//    if (!module) {
 		//        std::cerr << "Failed to create module" << std::endl;
@@ -104,7 +105,7 @@ public:
 		// // No extra options are needed unless you want to override the module's memory definition.
 		//     auto& memory = custom_mem;
 
-		std::cout << "waxi/ Instantiate user.wasm\n";
+		std::cout << "waxi/ Instantiate WASM blob..\n";
 		m_instance = new wasmtime::Instance(linker.instantiate(m_store, module).unwrap());
 		//    if (!instance) {
 		//        std::cerr << "Failed to instantiate module" << std::endl;
@@ -126,7 +127,7 @@ public:
 
 		auto mem_size_pages = m_memory->size(m_store);
 		auto mem_size_kb = (mem_size_pages * 64);
-		std::cout << "size: " << mem_size_pages << " pages / " << mem_size_kb << " KB\n";
+		std::cout <<  mem_size_pages << " pages / " << mem_size_kb << " KB\n";
 
 
 		// find plugin_start,stop,enable,etc
@@ -206,7 +207,7 @@ public:
 		}
 
 
-		std::cout << "\n> waxi/[wasm_id_here]->plugin_start()\n";
+		std::cout << "> waxi/[wasm_id_here]->plugin_start()\n";
 		this->set_fuel(m_fuel);
 
 		// plugin start takes 3 char buffers
@@ -343,7 +344,7 @@ public:
 		{
 			uint64_t consumed = m_fuel - fuel_level;
 			double percent = (double(consumed) / double(m_fuel)) * 100.0;
-			std::cout << "waxi/  consumed fuel:  " << consumed << " / " << m_fuel << "  [" << std::fixed << std::setprecision(1) << percent << "%]\n";
+			std::cout << "waxi/  consumed fuel:  " << consumed << " / " << m_fuel << "  [" << std::fixed << std::setprecision(1) << percent << "%]\n\n";
 		}
 
 		return fuel_level;
@@ -433,7 +434,7 @@ private:
 		}
 
 		// Copy four zero bytes to the memory offset at ptr
-		uint32_t zero = 'abcd';
+		uint32_t zero = 0xFFFFFFFF;
 		this->wasm_memcpy_to(ptr, &zero, 4);
 
 		std::vector<wasmtime::Val> args = {wasmtime::Val(ptr)};

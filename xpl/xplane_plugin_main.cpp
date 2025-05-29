@@ -89,7 +89,7 @@ void resolve_paths( WasmVM_Config &config ){
         pluginFolderName = pluginFolderName.substr(0, pluginFolderName.find_last_of("/\\")); //strip the os_64 leaf
 
         config.plugin_folder = pluginFolderName;
-        std::cout << "waxi/ plugin_folder: [" << config.plugin_folder << "]\n";
+        //std::cout << "waxi/ plugin_folder: [" << config.plugin_folder << "]\n";
     }
 
     // - {xp_root}
@@ -99,7 +99,7 @@ void resolve_paths( WasmVM_Config &config ){
         std::string xpRootPath(xpFolder);
         
         config.xp_folder = xpRootPath;
-        std::cout << "waxi/ xp_folder: [" << config.xp_folder << "]\n";
+        //std::cout << "waxi/ xp_folder: [" << config.xp_folder << "]\n";
     }
     
     // - {acf_root}
@@ -111,7 +111,7 @@ void resolve_paths( WasmVM_Config &config ){
         //std::cout << "waxi/ Aircraft API folder path: [" << acfFolder << "]\n";
         
         config.acf_folder = acfFolder;
-        std::cout << "waxi/ acf_folder: [" << config.acf_folder << "]\n";
+        //std::cout << "waxi/ acf_folder: [" << config.acf_folder << "]\n";
     }
 
 }
@@ -124,25 +124,24 @@ void resolve_paths( WasmVM_Config &config ){
 // Plugin start function
 PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
 
+    XPLMDebugString("WAXI_xpl starting..\n");
+
+
     // XPLMEnableFeature("XPLM_WANTS_REFLECTIONS", 1);
     XPLMEnableFeature("XPLM_USE_NATIVE_PATHS", 1);
-    XPLMEnableFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS", 1);
+    //XPLMEnableFeature("XPLM_USE_NATIVE_WIDGET_WINDOWS", 1);
     //XPLMEnableFeature("XPLM_WANTS_DATAREF_NOTIFICATIONS", 1);
 
-
-    // Ensure the callback is registered during plugin initialization
-    // RegisterFlightLoopCallback();
-
-
+    
     WasmVM_Config config;
+    // find the aircraft, x-plane and plugin folders.
     resolve_paths( config );
-
 
 
     std::string wasm_filename;
 
     std::string config_json_filename = config.plugin_folder + "/config.json";
-    std::cout << "waxi/ dyn config json fn: " + config_json_filename + "\n";
+    std::cout << "waxi/ config.json: [" + config_json_filename + "]\n";
 
     // Load configuration from config.json
     std::ifstream configFile(config_json_filename);
@@ -152,48 +151,45 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
             configFile >> jsonConfig;
 
 
-            // // Example: Parse some configuration values
-            // if (jsonConfig.contains("plugin_folder")) {
-            //     config.plugin_folder = jsonConfig["plugin_folder"].get<std::string>();
-            // }
-            // if (jsonConfig.contains("xp_folder")) {
-            //     config.xp_folder = jsonConfig["xp_folder"].get<std::string>();
-            // }
-            // if (jsonConfig.contains("acf_folder")) {
-            //     config.acf_folder = jsonConfig["acf_folder"].get<std::string>();
-            // }
-
+            std::string name, sig, desc;
+            if (jsonConfig.contains("name")) {
+                name = jsonConfig["name"].get<std::string>();
+            }
+            if (jsonConfig.contains("sig")) {
+                sig = jsonConfig["sig"].get<std::string>();
+            }
+            if (jsonConfig.contains("desc")) {
+                desc = jsonConfig["desc"].get<std::string>();
+            }
+            std::cout << "waxi/ config.json: name:[" << name << "]  sig:[" << sig << "]  desc:[" << desc << "]\n";
             
+
             if (jsonConfig.contains("wasm_filename")) {
                 wasm_filename = jsonConfig["wasm_filename"].get<std::string>();
                 
             }
 
-            
 
-
-            std::cout << "waxi/ Loaded configuration from config.json\n";
+            //std::cout << "waxi/ Loaded configuration from config.json\n";
         } catch (const std::exception &e) {
             std::cerr << "waxi/ Error parsing config.json: " << e.what() << "\n";
+            return 0;
         }
     } else {
         std::cerr << "waxi/ Could not open config.json\n";
+        return 0;
     }
 
 
 
-
-    //FIXME: wasm filename? config.json entry?
-    //std::string filename = acfFolderPath + "/wasm_plugin_basic.wasm";
-    // std::string wasm_filename = "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm";
-    std::cout << "waxi/ wasm filename:[" << wasm_filename << "]\n";
+    //std::cout << "waxi/ WASM filename:[" << wasm_filename << "]\n";
     global_WasmVM = new WasmVM( wasm_filename, config );
 
 
     // These values should be over-written by the call to plugin_start()
-    strncpy(outName, "WASM Plugin Shim", 255);
-    strncpy(outSig, "x-plugins.com/wasm_xpl", 255);
-    strncpy(outDesc, "WASM for X-Plane", 255);
+    strncpy(outName, "WAXI Default", 255);
+    strncpy(outSig, "x-plugins.com/WAXI", 255);
+    strncpy(outDesc, "WebAssembly X-Plane Interface", 255);
 
     // The outName, outSig, and outDesc buffers are guaranteed to be at least 256 bytes each.
     // Reference: X-Plane SDK documentation.
@@ -201,8 +197,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
     //XPLMDebugString("waxi/ Calling into wasm start...\n");
     int wasm_ret = global_WasmVM->call_plugin_start( outName, outSig, outDesc );
     
-    
-    XPLMDebugString("waxi/ Plugin started...\n");
+    //XPLMDebugString("waxi/ Plugin started...\n");
 
     return wasm_ret;
 }
