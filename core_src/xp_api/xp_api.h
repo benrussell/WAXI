@@ -54,7 +54,7 @@ public:
         
 
 
-        std::cout << "wasm_host/ Init XP_API" << std::endl;
+        std::cout << "waxi/ Init XP_API" << std::endl;
 
     }
 

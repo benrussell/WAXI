@@ -18,7 +18,7 @@ int main(int argc, const char* argv[]) {
         if (vm_husk.call_plugin_start( outName, outSig, outDesc ) ){
 
             vm_husk.call_plugin_enable();
-            std::cout << "wasm_host/ sending messages..\n";
+            std::cout << "waxi/ sending messages..\n";
                 for( int x=0; x<10; ++x){
                     vm_husk.call_plugin_message( 0, 1, x );
                 }

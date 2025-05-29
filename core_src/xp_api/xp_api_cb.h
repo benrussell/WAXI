@@ -20,7 +20,7 @@ public:
 	             int32_t          refcon)
 	  : m_store(store), m_func(func), m_refcon(refcon)
 	{
-		//std::cout << "wasm_host/ wasm_cb_wrap ctor store=" << store << '\n';
+		//std::cout << "waxi/ wasm_cb_wrap ctor store=" << store << '\n';
 
 		XPLMCreateFlightLoop_t fl{};
 		fl.structSize   = sizeof fl;
