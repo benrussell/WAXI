@@ -29,7 +29,7 @@ namespace xp_api
     public:
         static int64_t raw(Caller caller, char *c_str)
         {
-            std::cout << ">> api/ log_raw(" << c_str << ")" << std::endl;
+            //std::cout << ">> api/ log_raw(" << c_str << ")" << std::endl;
 
             #if USE_XP_SDK
                 XPLMDebugString( c_str );
