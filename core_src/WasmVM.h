@@ -50,7 +50,7 @@ public:
 
 		m_store = new wasmtime::Store(engine);
 		m_store->context().set_data((void*)m_store);
-		printf("WasmVM ctor: m_store ptr: %p\n", m_store);
+		//printf("wasm_host/ WasmVM ctor: m_store ptr: %p\n", m_store);
 
 		const std::string cwd = std::filesystem::current_path();
 
@@ -63,6 +63,7 @@ public:
 		wasi.inherit_stdout();
 		wasi.inherit_stderr();
 
+		//Configure VFS
 		WasiVfsMap( path_config, &wasi ); //path_config is passed in from the host plugin
 
 		
@@ -103,7 +104,7 @@ public:
 		// // No extra options are needed unless you want to override the module's memory definition.
 		//     auto& memory = custom_mem;
 
-		std::cout << "wasm_host/ Instantiate blob.wasm\n";
+		std::cout << "wasm_host/ Instantiate user.wasm\n";
 		m_instance = new wasmtime::Instance(linker.instantiate(m_store, module).unwrap());
 		//    if (!instance) {
 		//        std::cerr << "Failed to instantiate module" << std::endl;
@@ -111,7 +112,8 @@ public:
 		//        std::cerr << "Error message: " << error.message() << std::endl;
 		//        return 1;
 		//    }
-		std::cout << "wasm_host/   Success\n";
+		//std::cout << "wasm_host/   Success\n";
+
 
 		std::cout << "wasm_host/ WASM memory: ";
 		// Extract the memory from the instance
@@ -126,10 +128,11 @@ public:
 		auto mem_size_kb = (mem_size_pages * 64);
 		std::cout << "size: " << mem_size_pages << " pages / " << mem_size_kb << " KB\n";
 
+
 		// find plugin_start,stop,enable,etc
 		this->bind_wasm_exports();
 
-		this->set_fuel(m_fuel);
+		//this->set_fuel(m_fuel);
 
 	} // ctor
 
@@ -190,9 +193,9 @@ public:
 	{
 		// WASI start call.
 		{
-			this->set_fuel(m_fuel);
 			std::cout << "\n> wasm_host/[wasm_id_here]->_start()\n";
-		
+			this->set_fuel(m_fuel);
+			
 			if (m_wfn_wasi_start.has_value()) {
 				auto result = m_wfn_wasi_start.value().call(m_store, {}).unwrap();
 			} else {
@@ -203,6 +206,7 @@ public:
 		}
 
 
+		std::cout << "\n> wasm_host/[wasm_id_here]->plugin_start()\n";
 		this->set_fuel(m_fuel);
 
 		// plugin start takes 3 char buffers
@@ -221,14 +225,14 @@ public:
 			wasmtime::Val(ptr_b),
 			wasmtime::Val(ptr_c)};
 
-		std::cout << "\n> wasm_host/[wasm_id_here]->plugin_start(a,b,c)\n";
+		//std::cout << "\n> wasm_host/[wasm_id_here]->plugin_start(a,b,c)\n";
 		auto result = m_wfn_plugin_start.value().call(m_store, args).unwrap();
 
 		int ret = 0;
 		{
 			// fflush( stdout );
-			// std::cout << "> wasm_host/plugin_start returned, result count: " << result.size() << "\n";
-			std::cout << "> wasm_host/ plugin_start returned: " << result[0].i32() << std::endl;
+			// std::cout << "wasm_host/plugin_start returned, result count: " << result.size() << "\n";
+			std::cout << "wasm_host/[wasm_id_here] plugin_start returned: " << result[0].i32() << std::endl;
 			ret = result[0].i32();
 		}
 
@@ -243,7 +247,7 @@ public:
 		}
 		else
 		{
-			std::cout << "> wasm_host/ WASM module refused to start.\n";
+			std::cout << "wasm_host/[wasm_id_here] WASM module refused to start.\n";
 		}
 
 		// MUST free resources - these calls count twd fuel usage!
@@ -276,6 +280,7 @@ public:
 	void call_plugin_stop()
 	{
 		std::cout << "\n> wasm_host/[wasm_id_here]->plugin_stop()\n";
+		this->set_fuel(m_fuel);
 		auto result = m_wfn_plugin_stop.value().call(m_store, {}).unwrap();
 		this->check_fuel();
 	}
@@ -286,32 +291,8 @@ public:
 	int call_plugin_enable()
 	{
 		std::cout << "\n> wasm_host/[wasm_id_here]->plugin_enable()\n";
-
-		this->set_fuel(m_fuel * 3);
-
+		this->set_fuel(m_fuel);
 		auto result = m_wfn_plugin_enable.value().call(m_store, {}).unwrap();
-
-
-
-
-#if 0
-								// --- FLCB fixed call hack
-								// --- FLCB fixed call hack
-								// --- FLCB fixed call hack
-								// --- FLCB fixed call hack
-								// --- FLCB fixed call hack
-								
-								printf( "wasm flcb cbf_ptr: %i\n", xp_api::cb::glob_cbf_ptr );
-								auto res_prox = m_wfn_plugin_flcb_proxy.value().call( 
-									m_store, 
-									{
-									wasmtime::Val(xp_api::cb::glob_cbf_ptr)
-									}
-								).unwrap();
-#endif								
-
-
-
 		this->check_fuel();
 
 		return 1;
@@ -322,8 +303,8 @@ public:
 
 	void call_plugin_disable()
 	{
-
 		std::cout << "\n> wasm_host/[wasm_id_here]->plugin_disable()\n";
+		this->set_fuel(m_fuel);
 		auto result = m_wfn_plugin_disable.value().call(m_store, {}).unwrap();
 		this->check_fuel();
 	}
@@ -334,13 +315,14 @@ public:
 	void call_plugin_message(int64_t inFromWho, int64_t inMessage, int32_t inParam)
 	{
 
-		// std::cout << "\n> wasm_host/call: plugin_message\n";
+		std::cout << "\n> wasm_host/call: plugin_message\n";
+		this->set_fuel(m_fuel);
 		std::vector<wasmtime::Val> args = {
 			wasmtime::Val(inFromWho),
 			wasmtime::Val(inMessage),
 			wasmtime::Val(inParam)};
 		auto result = m_wfn_plugin_message.value().call(m_store, args).unwrap();
-		// this->check_fuel();
+		this->check_fuel();
 	}
 
 
@@ -360,9 +342,8 @@ public:
 
 		{
 			uint64_t consumed = m_fuel - fuel_level;
-			std::cout << "wasm_host/  consumed fuel: " << consumed << "\n";
 			double percent = (double(consumed) / double(m_fuel)) * 100.0;
-			std::cout << "wasm_host/  fuel consumed: " << std::fixed << std::setprecision(1) << percent << "%\n";
+			std::cout << "wasm_host/  consumed fuel:  " << consumed << " / " << m_fuel << "  [" << std::fixed << std::setprecision(1) << percent << "%]\n";
 		}
 
 		return fuel_level;
