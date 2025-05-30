@@ -1,8 +1,12 @@
 
+//FIXME: xp_api seems to depend on these..
 #include <XPLMPlugin.h>
 #include <XPLMProcessing.h>
 #include <XPLMUtilities.h>
 #include <XPLMPlanes.h>
+#include <XPLMDisplay.h>
+#include <GL/gl.h>
+
 
 #include "WasmVM.h"
 #include "WasmVM_Config.h"
@@ -18,9 +22,7 @@ WasmVM* global_WasmVM;
 
 
 
-
-#include <XPLMDisplay.h>
-#include <GL/gl.h>
+#if 0
 
 // Basic Panel Phase Drawing Callback
 int PanelDrawCallback(XPLMDrawingPhase inPhase, int inIsBefore, void* inRefcon) {
@@ -57,6 +59,7 @@ void UnregisterPanelDrawCallback() {
     XPLMUnregisterDrawCallback(PanelDrawCallback, xplm_Phase_Window, 0, nullptr);
 }
 
+#endif
 
 
 
@@ -264,7 +267,7 @@ PLUGIN_API void XPluginStop(void) {
 // Plugin enable function
 PLUGIN_API int XPluginEnable(void) {
 
-    RegisterPanelDrawCallback();
+    //RegisterPanelDrawCallback();
 
     // Code to enable the plugin
     return global_WasmVM->call_plugin_enable();;
@@ -281,9 +284,7 @@ PLUGIN_API void XPluginDisable(void) {
 // Plugin receive message function
 PLUGIN_API void XPluginReceiveMessage(XPLMPluginID inFromWho, int inMessage, void *inParam) {
     // Handle messages here
-
     global_WasmVM->call_plugin_message(inFromWho, inMessage, reinterpret_cast<intptr_t>(inParam));
-
 }
 
 
