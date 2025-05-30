@@ -25,6 +25,9 @@ namespace xp_api{}
 #include "xp_api_gfx.h"
 #include "xp_api_log.h"
 
+#include "xp_api_nvg.h"
+
+
 class XP_API{ //FIXME: this needs a new name.
 
 public:
@@ -74,6 +77,34 @@ public:
         
         }
 
+
+
+
+        {
+        //nanovg proxy
+
+        // All of these require a custom export wrapper
+
+         auto res1 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderCreate, "waxi_nvg@1", "xpRenderCreate");
+        // auto res2 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderCreateTexture, "waxi_nvg@1", "xpRenderCreateTexture");
+        auto res3 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderDeleteTexture, "waxi_nvg@1", "xpRenderDeleteTexture");
+        // auto res4 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderUpdateTexture, "waxi_nvg@1", "xpRenderUpdateTexture");
+        
+        //auto res5 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderGetTextureSize, "waxi_nvg@1", "xpRenderGetTextureSize");
+        auto res6 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderViewport, "waxi_nvg@1", "xpRenderViewport");
+        
+        // these share sig
+        auto res7 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderCancel, "waxi_nvg@1", "xpRenderCancel");
+        auto res8 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderFlush, "waxi_nvg@1", "xpRenderFlush");
+        
+        // auto res9 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderFill, "waxi_nvg@1", "xpRenderFill");
+        // auto res10 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderStroke, "waxi_nvg@1", "xpRenderStroke");
+        
+        // auto res11 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderTriangles, "waxi_nvg@1", "xpRenderTriangles");
+        
+        auto res12 = LinkerHelpers::wrap_and_expose(linker, xp_api::nvg_proxy::renderDelete, "waxi_nvg@1", "xpRenderDelete");
+        
+        }
 
         
 
