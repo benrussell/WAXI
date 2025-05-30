@@ -20,6 +20,8 @@ using namespace wasmtime;
 #include "WasmVM_Config.h"
 
 
+#include "NvgProxy.h"
+
 
 class WasmVM
 {
@@ -132,6 +134,8 @@ public:
 
 		// find plugin_start,stop,enable,etc
 		this->bind_wasm_exports();
+
+		NvgProxy p;
 
 		//this->set_fuel(m_fuel);
 
