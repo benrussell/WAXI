@@ -22,6 +22,34 @@ namespace xp_api
         {
             //std::cout << "waxi/api/ gfx_draw_dbg_tri(" << x << "," << y << ")" << std::endl;
 
+
+                glDisable( GL_CULL_FACE );
+
+                glPushMatrix();
+
+                glTranslatef( x * 1.f, y * 1.f, 0 );
+                
+                //glRotatef( rot, 0.f,0.f,1.f);
+                //rot += 0.5f;
+
+                glBegin(GL_TRIANGLES);
+                            glColor3f( 1.f, 0.f, 0.f );
+                            glVertex3f( -50.0f, -33.33f, 0.f );
+
+                            glColor3f( 0.f, 1.f, 0.f );
+                            glVertex3f( 50.0f, -33.33f, 0.f );
+
+                            glColor3f( 0.f, 0.f, 1.f );
+                            glVertex3f( 0.0f, 66.67f, 0.f );
+                            glEnd();
+                glPopMatrix();
+
+
+                glEnable( GL_CULL_FACE );
+
+
+
+            #if 0
             glPushMatrix();
 
                 glTranslatef( x * 1.f, y * 1.f, 0 );
@@ -44,6 +72,9 @@ namespace xp_api
                 glPopAttrib();
 
             glPopMatrix();
+#endif
+
+
 
             // // Example array of three char* values
             // static const char *cmd_names[] = {"cmd/a", "cmd/b", "cmd/c"};
