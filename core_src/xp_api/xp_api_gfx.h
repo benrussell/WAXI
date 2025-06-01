@@ -1,4 +1,5 @@
-
+#ifndef XP_API_GFX_H
+#define XP_API_GFX_H
 
 #include <fstream>
 #include <iostream>
@@ -10,6 +11,10 @@
 // #include "WasmVM.h"
 
 #include "LinkerHelpers.h"
+
+
+#include <GL/glew.h>
+#include <GL/gl.h>
 
 using namespace wasmtime;
 
@@ -107,3 +112,6 @@ namespace xp_api
         // }
     };
 }
+
+
+#endif
