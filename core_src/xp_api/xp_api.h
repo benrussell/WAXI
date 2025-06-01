@@ -85,6 +85,8 @@ public:
 
         // All of these require a custom export wrapper
 
+        auto res01 = LinkHelp::wrap(linker, xp_api::nvg_proxy::getContextHandle, "waxi_nvg@1", "getContextHandle");
+
         auto res1 = LinkHelp::wrap(linker, xp_api::nvg_proxy::renderCreate, "waxi_nvg@1", "xpRenderCreate");
         auto res2 = LinkHelp::wrap(linker, xp_api::nvg_proxy::renderCreateTexture, "waxi_nvg@1", "xpRenderCreateTexture");
         auto res3 = LinkHelp::wrap(linker, xp_api::nvg_proxy::renderDeleteTexture, "waxi_nvg@1", "xpRenderDeleteTexture");

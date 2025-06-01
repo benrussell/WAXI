@@ -36,12 +36,35 @@ namespace xp_api
         // do we expose a host fn that can request a new ctx?
 
 
+        // Function pointer to be bound at runtime.
+        inline static int (*late_bind_renderCreate)(void*) = nullptr;
+
+        // Setter function to assign the function pointer.
+        static void setLateBindRenderCreate(int (*fn)(void*)) {
+            late_bind_renderCreate = fn;
+        }
+
+
+
+
+
+        //we do a direct write to this after we have a nanovg OpenGL context ptr to stash in it.
+        static uint64_t wasm_nvg_context_handle;
+
+        static uint64_t getContextHandle(){
+            std::cout << "waxi/nvg_proxy/getContextHandle(): ret: " << wasm_nvg_context_handle << "\n";
+            return nvg_proxy::wasm_nvg_context_handle;
+        };
+
+
+
+
+
     //the ptrs here cross the WASM memory boundary and need book keeping
         static int renderCreate( uint64_t uptr ){
             std::cout << "waxi/nvg_proxy/renderCreate: uptr: " << uptr << "\n";
 
-            void* mem_ptr = reinterpret_cast<void*>(uptr);
-
+            
             /*
             
             Obvious solution:
@@ -55,6 +78,10 @@ namespace xp_api
             Debug logging for now will move us fwd a bit with WASM data exchange.
             */
             //int res = glnvg__renderCreate( mem_ptr );
+
+            printf("waxi/nvg_proxy/renderCreate late bind fn_ptr: %p\n", late_bind_renderCreate);
+
+            late_bind_renderCreate((void*)uptr);
 
             return 1;
         };
@@ -198,5 +225,9 @@ namespace xp_api
     };
 }
 
+
+
+
+uint64_t xp_api::nvg_proxy::wasm_nvg_context_handle;
 
 #endif

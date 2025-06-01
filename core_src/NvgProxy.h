@@ -22,8 +22,11 @@ using namespace wasmtime;
 
 
 class NvgProxy{
-    private:
+    public:
     NVGcontext* m_vg;
+    NVGparams m_params;
+
+    uint64_t m_gl_ptr;
 
 
     public:

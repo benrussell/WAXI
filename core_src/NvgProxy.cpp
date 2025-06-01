@@ -28,25 +28,32 @@ NvgProxy::NvgProxy(){
 
     std::cout << "waxi/api/nvg: Custom Params NvgProxy wrapper\n";
 
-    struct NVGparams params;
+    #if 1
+    //struct NVGparams params;
     struct NVGcontext* ctx = NULL;
 	struct GLNVGcontext* gl = (struct GLNVGcontext*)malloc(sizeof(struct GLNVGcontext));
 	if (gl == NULL) goto error;
 	memset(gl, 0, sizeof(struct GLNVGcontext));
 
-	memset(&params, 0, sizeof(params));
-	params.renderCreate = glnvg__renderCreate;
-	params.renderCreateTexture = glnvg__renderCreateTexture;
-	params.renderDeleteTexture = glnvg__renderDeleteTexture;
-	params.renderUpdateTexture = glnvg__renderUpdateTexture;
-	params.renderGetTextureSize = glnvg__renderGetTextureSize;
-	params.renderViewport = glnvg__renderViewport;
-	params.renderFlush = glnvg__renderFlush;
-	params.renderFill = glnvg__renderFill;
-	params.renderStroke = glnvg__renderStroke;
-	params.renderTriangles = glnvg__renderTriangles;
-	params.renderDelete = glnvg__renderDelete;
-	params.userPtr = gl;
+    printf("waxi/NvgProxy/ctor late bind glnvg__renderCreate ptr: %p\n", glnvg__renderCreate);
+    printf("waxi/NvgProxy/ctor GLNVGcontext ptr: %lu\n", gl);
+
+    m_gl_ptr = (uint64_t)gl; //FIXME: This is a hack but its the magic we needed to get the correct contexxt in/out of WASM.
+
+
+	memset(&m_params, 0, sizeof(m_params));
+	m_params.renderCreate = glnvg__renderCreate;
+	m_params.renderCreateTexture = glnvg__renderCreateTexture;
+	m_params.renderDeleteTexture = glnvg__renderDeleteTexture;
+	m_params.renderUpdateTexture = glnvg__renderUpdateTexture;
+	m_params.renderGetTextureSize = glnvg__renderGetTextureSize;
+	m_params.renderViewport = glnvg__renderViewport;
+	m_params.renderFlush = glnvg__renderFlush;
+	m_params.renderFill = glnvg__renderFill;
+	m_params.renderStroke = glnvg__renderStroke;
+	m_params.renderTriangles = glnvg__renderTriangles;
+	m_params.renderDelete = glnvg__renderDelete;
+	m_params.userPtr = gl;
 
     // //these are usually args to nvgCreateGL2(...)
     // int atlasw=NVG_ANTIALIAS | NVG_STENCIL_STROKES;
@@ -59,11 +66,13 @@ NvgProxy::NvgProxy(){
 
 	//gl->edgeAntiAlias = edgeaa;
 
-    ctx = nvgCreateInternal(&params);
+    ctx = nvgCreateInternal(&m_params);
 	if (ctx == NULL) goto error;
 
 	//return ctx;
     m_vg = ctx;
+
+    printf("NvgProxy created a new new context @: %lu\n", m_vg);
 
     if (m_vg == nullptr) {
 		std::cout << " Init nvg: FAILED\n";
@@ -77,8 +86,12 @@ error:
 	if (ctx != NULL) nvgDeleteInternal(ctx);
 	//return NULL;
     throw std::runtime_error("NVG failed - unknown error");
+#endif
 
 
+
+
+// Basic automatic GL context create - works for BKIn28
 #if 0
 
     std::cout << " Init nvg! ********************\n";

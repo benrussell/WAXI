@@ -80,6 +80,22 @@ public:
 		// add our custom host API into the wasm mix.
 		XP_API::init(linker, m_store);
 
+
+
+		m_nvgProxy = new NvgProxy();
+		
+		
+		xp_api::nvg_proxy::wasm_nvg_context_handle = (uint64_t)m_nvgProxy->m_gl_ptr;
+		printf("WasmVM ctor: wasm_nvg_context_handle: %lu\n", xp_api::nvg_proxy::wasm_nvg_context_handle);
+
+		//FIXME: this is a hack. we're extracting NVG-GL backend functions from the context we just created.
+		xp_api::nvg_proxy::late_bind_renderCreate = m_nvgProxy->m_params.renderCreate;
+
+
+
+
+
+
 		// Load the WASM module
 		std::vector<uint8_t> wasm_bytes = this->read_file(filename);
 		std::cout << "waxi/ Read WASM blob: [" << filename << "]\n";
@@ -135,7 +151,7 @@ public:
 		// find plugin_start,stop,enable,etc
 		this->bind_wasm_exports();
 
-		NvgProxy p;
+
 
 		//this->set_fuel(m_fuel);
 
@@ -146,6 +162,7 @@ public:
 
 	~WasmVM()
 	{
+		delete m_nvgProxy;
 		delete m_instance;
 		delete m_store;
 	} // dtor
@@ -358,6 +375,8 @@ public:
 
 
 private:
+	NvgProxy* m_nvgProxy;
+
 	wasmtime::Store *m_store;
 	wasmtime::Instance *m_instance;
 	std::optional<wasmtime::Memory> m_memory;
