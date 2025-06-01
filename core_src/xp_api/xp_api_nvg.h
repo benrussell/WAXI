@@ -121,7 +121,8 @@ namespace xp_api
         };
         
         //almost shared, might work?
-        static void      renderFill(uint64_t uptr, 
+        static void      renderFill(
+            uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
             NVGcompositeOperationState compositeOperation, // this is a struct of four ints
             uint32_t scissor_wptr, //NVGscissor* scissor, 
@@ -144,7 +145,8 @@ namespace xp_api
                     << "\n";
             
         };
-        static void    renderStroke(uint64_t uptr, 
+        static void    renderStroke(
+            uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
             NVGcompositeOperationState compositeOperation, // this is a struct of four ints
             uint32_t scissor_wptr, //NVGscissor* scissor, 
@@ -166,7 +168,8 @@ namespace xp_api
 
         };
 
-        static void renderTriangles(uint64_t uptr, 
+        static void renderTriangles(
+            uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
             NVGcompositeOperationState compositeOperation, // this is a struct of four ints
             uint32_t scissor_wptr, //NVGscissor* scissor, 
