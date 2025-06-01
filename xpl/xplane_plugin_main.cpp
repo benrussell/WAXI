@@ -5,7 +5,9 @@
 #include <XPLMUtilities.h>
 #include <XPLMPlanes.h>
 #include <XPLMDisplay.h>
-#include <GL/gl.h>
+
+
+//#include <GL/gl.h>
 
 
 #include "WasmVM.h"
@@ -15,114 +17,13 @@
 
 WasmVM* global_WasmVM;
 
-
 #include <nlohmann/json.hpp>
 
 
 
 
 
-#if 0
 
-// Basic Panel Phase Drawing Callback
-int PanelDrawCallback(XPLMDrawingPhase inPhase, int inIsBefore, void* inRefcon) {
-
-    //std::cout << "waxi/ panel draw callback fired..\n";
-
-    if (inPhase == xplm_Phase_Window) {
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-        // Set drawing color to green
-        glColor3f(1.0f, 0.0f, 1.0f);
-
-        // Draw a simple rectangle
-        glBegin(GL_LINE_LOOP);
-            glVertex2f(50.0f, 50.0f);
-            glVertex2f(250.0f, 50.0f);
-            glVertex2f(250.0f, 150.0f);
-            glVertex2f(50.0f, 150.0f);
-        glEnd();
-
-        glPopAttrib();
-    }
-    return 1; // Redraw every frame
-}
-
-// Register the panel draw callback
-void RegisterPanelDrawCallback() {
-    std::cout << "waxi/ proto/ register drawing cb\n";
-    XPLMRegisterDrawCallback(PanelDrawCallback, xplm_Phase_Window, 0, nullptr);
-}
-
-// Unregister the panel draw callback
-void UnregisterPanelDrawCallback() {
-    XPLMUnregisterDrawCallback(PanelDrawCallback, xplm_Phase_Window, 0, nullptr);
-}
-
-#endif
-
-
-
-
-
-
-#if 0
-// Flight loop callback function
-float CustomFlightLoopCallback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void *inRefcon) {
-    // Custom logic for the flight loop callback
-    //std::cout << "CustomFlightLoopCallback\n";
-    //std::cout << "CustomFlightLoopCallback called. Elapsed time: " << inElapsedSinceLastCall << " seconds.\n";
-
-    // Example: Call a function in the WasmVM
-    if (global_WasmVM) {
-        //global_WasmVM->call_flight_loop(inElapsedSinceLastCall, inElapsedTimeSinceLastFlightLoop, inCounter);
-    }
-
-    // Return the interval in seconds for the next callback
-    return 0.1f; // Call again in 1 second
-}
-
-
-// Register the flight loop callback
-void RegisterFlightLoopCallback() {
-    std::cout << "waxi/ registering flcb\n";
-    //XPLMRegisterFlightLoopCallback(CustomFlightLoopCallback, 1.0f, nullptr); // Initial interval of 1 second
-
-
-    // Output the pointer address of CustomFlightLoopCallback as a decimal value
-    printf("waxi/ flcb ptr: %p\n", &CustomFlightLoopCallback);
-
-    // Create a flight loop structure
-    XPLMCreateFlightLoop_t flightLoopParams;
-    flightLoopParams.structSize = sizeof(XPLMCreateFlightLoop_t);
-    flightLoopParams.refcon = nullptr;
-    flightLoopParams.callbackFunc = CustomFlightLoopCallback;
-    flightLoopParams.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
-    //flightLoopParams.phase = xplm_FlightLoop_Phase_AfterFlightModel;
-
-    printf("waxi/ handoff: fl_param.callbackFunc: %p\n", flightLoopParams.callbackFunc);
-
-    printf("waxi/ handoff stackptr for flcb_params: %p\n", &flightLoopParams);
-
-    // Create the flight loop
-    XPLMFlightLoopID flightLoopID = XPLMCreateFlightLoop(&flightLoopParams);
-
-
-    // Schedule the flight loop to run
-    XPLMScheduleFlightLoop(
-        flightLoopID, 
-        0.01f, 
-        1
-    );
-
-
-}
-
-// Unregister the flight loop callback
-void UnregisterFlightLoopCallback() {
-    //XPLMUnregisterFlightLoopCallback(CustomFlightLoopCallback, nullptr);
-}
-#endif
 
 
 void resolve_paths( WasmVM_Config &config ){
