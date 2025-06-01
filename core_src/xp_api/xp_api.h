@@ -98,8 +98,8 @@ public:
         auto res8 = LinkHelp::wrap(linker, xp_api::nvg_proxy::renderFlush, "waxi_nvg@1", "xpRenderFlush");
         
         auto res9 = LinkHelp::wrap_nvg_proxy_renderFill(linker, "waxi_nvg@1", "xpRenderFill", xp_api::nvg_proxy::renderFill);
-        // auto res10 = LinkHelp::wrap_and_expose(linker, xp_api::nvg_proxy::renderStroke, "waxi_nvg@1", "xpRenderStroke");
-        // auto res11 = LinkHelp::wrap_and_expose(linker, xp_api::nvg_proxy::renderTriangles, "waxi_nvg@1", "xpRenderTriangles");
+        auto res10 = LinkHelp::wrap_nvg_proxy_renderStroke(linker, "waxi_nvg@1", "xpRenderStroke", xp_api::nvg_proxy::renderStroke);
+        auto res11 = LinkHelp::wrap_nvg_proxy_renderTriangles(linker, "waxi_nvg@1", "xpRenderTriangles", xp_api::nvg_proxy::renderTriangles);
         
         auto res12 = LinkHelp::wrap(linker, xp_api::nvg_proxy::renderDelete, "waxi_nvg@1", "xpRenderDelete");
         

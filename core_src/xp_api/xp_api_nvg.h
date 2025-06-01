@@ -120,6 +120,7 @@ namespace xp_api
             std::cout << "waxi/nvg_proxy/renderFlush: uptr: " << uptr << "\n";
         };
         
+
         //almost shared, might work?
         static void      renderFill(
             uint64_t uptr, 
@@ -145,6 +146,8 @@ namespace xp_api
                     << "\n";
             
         };
+
+
         static void    renderStroke(
             uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
@@ -168,6 +171,7 @@ namespace xp_api
 
         };
 
+        
         static void renderTriangles(
             uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
@@ -189,6 +193,7 @@ namespace xp_api
 
         };
         
+
         //shared
         static void renderDelete(uint64_t uptr){
             std::cout << "waxi/nvg_proxy/renderDelete: uptr: " << uptr << "\n";
