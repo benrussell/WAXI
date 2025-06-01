@@ -33,7 +33,7 @@ public:
 	{
 
 		wasmtime::Config config;
-		config.consume_fuel(true);
+		// config.consume_fuel(true);
 		config.debug_info(true);		   // Enable DWARF debug info for better stack traces
 		config.wasm_threads(true);		   // Enable support for wasm threads (atomics)
 		config.wasm_simd(true);			   // Enable SIMD instructions
@@ -354,13 +354,13 @@ public:
 	void set_fuel(size_t f)
 	{
 		std::cout << "wasm_vm->set_fuel(" << f << ")\n";
-		m_store->context().set_fuel(f).unwrap();
+		//m_store->context().set_fuel(f).unwrap();
 	}
 
 
 	size_t check_fuel()
 	{
-		size_t fuel_level = m_store->context().get_fuel().unwrap();
+		size_t fuel_level = 0; //m_store->context().get_fuel().unwrap();
 
 		{
 			uint64_t consumed = m_fuel - fuel_level;
