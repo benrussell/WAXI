@@ -104,7 +104,11 @@ public:
                 Caller caller, 
                 uint64_t uptr,
                 uint32_t paint_wptr,
-                NVGcompositeOperationState comp,
+                //NVGcompositeOperationState comp, - destrctured into four ints by WASM
+                    int32_t comp_a,
+                    int32_t comp_b,
+                    int32_t comp_c,
+                    int32_t comp_d,
                 uint32_t scissor_wptr,
                 float fringe,
                 const uint32_t bounds_wptr,
@@ -138,8 +142,8 @@ public:
 #endif
 
 
-                //args hack
-                //NVGcompositeOperationState comp; //FIXME: wrapper for this is STILl broken.
+                // re-construct the struct before we call our underlying code
+                NVGcompositeOperationState comp { comp_a, comp_b, comp_c, comp_d };
 
                 // Call the actual function
                 fn_plain(
