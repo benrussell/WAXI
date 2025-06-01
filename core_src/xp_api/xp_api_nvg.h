@@ -28,25 +28,8 @@ namespace xp_api
     {
     public:
 
-        // Need a method to pass a ptr into WASM for nvg context.
-        // This ptr might be a NvgProxy heap instanec.
-        // It might be some other more general struct.
-        // It might be a ctx handle created by nvg gl?
-        // do we push this into plugin_start as a param?
-        // do we expose a host fn that can request a new ctx?
-
-
-        // Function pointer to be bound at runtime.
-        inline static int (*late_bind_renderCreate)(void*) = nullptr;
-
-        // Setter function to assign the function pointer.
-        static void setLateBindRenderCreate(int (*fn)(void*)) {
-            late_bind_renderCreate = fn;
-        }
-
-
-
-
+        // Host GLNVG context is exposed to WASM through 
+        // nvg_proxy_getContextHandle()    
 
         //we do a direct write to this after we have a nanovg OpenGL context ptr to stash in it.
         static uint64_t wasm_nvg_context_handle;
@@ -60,13 +43,7 @@ namespace xp_api
 
 
 
-    //the ptrs here cross the WASM memory boundary and need book keeping
-        static int renderCreate( uint64_t uptr ){
-            std::cout << "waxi/nvg_proxy/renderCreate: uptr: " << uptr << "\n";
-
-            
-            /*
-            
+        /*            
             Obvious solution:
             #define NANOVG_GL2_IMPLEMENTATION 1
             #include "../obsolete/nanovg_gl2.h"
@@ -76,14 +53,35 @@ namespace xp_api
 
             Routing to the backend functions is going to take a little more work.
             Debug logging for now will move us fwd a bit with WASM data exchange.
-            */
+        */
             //int res = glnvg__renderCreate( mem_ptr );
 
-            printf("waxi/nvg_proxy/renderCreate late bind fn_ptr: %p\n", late_bind_renderCreate);
+        // Hackish solution, duplicate set of late binding fn ptrs.
+        // Function pointer to be bound at runtime.
+        inline static int (*late_bind_renderCreate)(void*) = nullptr;
 
-            late_bind_renderCreate((void*)uptr);
+        inline static int (*late_bind_renderCreateTexture)(void* uptr, int type, int w, int h, int imageFlags, const unsigned char* data) = nullptr;
+        inline static int (*late_bind_renderDeleteTexture)(void* uptr, int image) = nullptr;
+        inline static int (*late_bind_renderUpdateTexture)(void* uptr, int image, int x, int y, int w, int h, const unsigned char* data) = nullptr;
+        inline static int (*late_bind_renderGetTextureSize)(void* uptr, int image, int* w, int* h) = nullptr;
+        inline static void (*late_bind_renderViewport)(void* uptr, float width, float height, float devicePixelRatio) = nullptr;
+        inline static void (*late_bind_renderCancel)(void* uptr) = nullptr;
+        inline static void (*late_bind_renderFlush)(void* uptr) = nullptr;
+        inline static void (*late_bind_renderFill)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, float fringe, const float* bounds, const NVGpath* paths, int npaths) = nullptr;
+        inline static void (*late_bind_renderStroke)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, float fringe, float strokeWidth, const NVGpath* paths, int npaths) = nullptr;
+        inline static void (*late_bind_renderTriangles)(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation, NVGscissor* scissor, const NVGvertex* verts, int nverts, float fringe) = nullptr;
 
-            return 1;
+        inline static void (*late_bind_renderDelete)(void*) = nullptr;
+
+
+
+
+    //the ptrs here cross the WASM memory boundary and need book keeping
+        static int renderCreate( uint64_t uptr ){
+            std::cout << "waxi/nvg_proxy/renderCreate: uptr: " << uptr << "\n";
+
+            //printf("waxi/nvg_proxy/renderCreate late bind fn_ptr: %p\n", late_bind_renderCreate);
+            return late_bind_renderCreate((void*)uptr);
         };
         static int renderCreateTexture(uint64_t uptr, int type, int w, int h, int imageFlags, uint32_t data_wptr){
 
@@ -219,7 +217,7 @@ namespace xp_api
         //shared
         static void renderDelete(uint64_t uptr){
             std::cout << "waxi/nvg_proxy/renderDelete: uptr: " << uptr << "\n";
-
+            late_bind_renderDelete((void*)uptr);
         };
         
     };

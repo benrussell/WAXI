@@ -91,6 +91,21 @@ public:
 		//FIXME: this is a hack. we're extracting NVG-GL backend functions from the context we just created.
 		xp_api::nvg_proxy::late_bind_renderCreate = m_nvgProxy->m_params.renderCreate;
 
+		xp_api::nvg_proxy::late_bind_renderCreateTexture = m_nvgProxy->m_params.renderCreateTexture;
+		xp_api::nvg_proxy::late_bind_renderDeleteTexture = m_nvgProxy->m_params.renderDeleteTexture;
+		xp_api::nvg_proxy::late_bind_renderUpdateTexture = m_nvgProxy->m_params.renderUpdateTexture;
+		xp_api::nvg_proxy::late_bind_renderGetTextureSize = m_nvgProxy->m_params.renderGetTextureSize;
+		xp_api::nvg_proxy::late_bind_renderViewport = m_nvgProxy->m_params.renderViewport;
+		xp_api::nvg_proxy::late_bind_renderCancel = m_nvgProxy->m_params.renderCancel;
+		xp_api::nvg_proxy::late_bind_renderFlush = m_nvgProxy->m_params.renderFlush;
+		xp_api::nvg_proxy::late_bind_renderFill = m_nvgProxy->m_params.renderFill;
+		xp_api::nvg_proxy::late_bind_renderStroke = m_nvgProxy->m_params.renderStroke;
+		xp_api::nvg_proxy::late_bind_renderTriangles = m_nvgProxy->m_params.renderTriangles;
+		
+		xp_api::nvg_proxy::late_bind_renderDelete = m_nvgProxy->m_params.renderDelete;
+		
+		//FIXME: add calls to these fns inside our api wrapper
+
 
 
 
