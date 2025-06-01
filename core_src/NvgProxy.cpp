@@ -112,9 +112,9 @@ void NvgProxy::init(wasmtime::Linker &linker, wasmtime::Store *store){
 
     {
     // // std::cout << ">> api/ export dref module" << std::endl;
-    // auto res3 = LinkerHelpers::wrap_and_expose_caller_charptr(linker,               "waxi_dref@1", "find", xp_api::dref::find);
-    // auto res4 = LinkerHelpers::wrap_and_expose(linker, xp_api::dref::getFloat,      "waxi_dref@1", "getFloat");
-    // auto res5 = LinkerHelpers::wrap_and_expose(linker, xp_api::dref::setFloat,      "waxi_dref@1", "setFloat");
+    // auto res3 = LinkHelp::wrap_and_expose_caller_charptr(linker,               "waxi_dref@1", "find", xp_api::dref::find);
+    // auto res4 = LinkHelp::wrap(linker, xp_api::dref::getFloat,      "waxi_dref@1", "getFloat");
+    // auto res5 = LinkHelp::wrap(linker, xp_api::dref::setFloat,      "waxi_dref@1", "setFloat");
     }
 
 }
