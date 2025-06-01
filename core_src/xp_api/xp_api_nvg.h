@@ -1,4 +1,5 @@
-
+#ifndef XP_API_NVG_H
+#define XP_API_NVG_H
 
 #include <fstream>
 #include <iostream>
@@ -12,15 +13,9 @@
 #include "LinkerHelpers.h"
 
 
-
-#define USE_XP_SDK 1
-#if USE_XP_SDK
-#include <XPLMUtilities.h>
-#endif
-
-
-
 #include "nanovg.h"
+
+
 
 
 
@@ -202,3 +197,6 @@ namespace xp_api
         
     };
 }
+
+
+#endif
