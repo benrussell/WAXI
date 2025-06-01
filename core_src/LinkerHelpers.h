@@ -194,9 +194,9 @@ public:
                 uint32_t paint_wptr,
                 //NVGcompositeOperationState comp, - destrctured into four ints by WASM
                     int32_t comp_a,
-                    int32_t comp_b,
-                    int32_t comp_c,
-                    int32_t comp_d,
+                    // int32_t comp_b,
+                    // int32_t comp_c,
+                    // int32_t comp_d,
                 uint32_t scissor_wptr,
                 float fringe,
                 float strokeWidth,
@@ -231,7 +231,7 @@ public:
 
 
                 // re-construct the struct before we call our underlying code
-                NVGcompositeOperationState comp { comp_a, comp_b, comp_c, comp_d };
+                NVGcompositeOperationState comp { comp_a }; // comp_b, comp_c, comp_d };
 
                 // Call the actual function
                 fn_plain(
@@ -286,9 +286,9 @@ public:
                 uint32_t paint_wptr,
                 //NVGcompositeOperationState comp, - destrctured into four ints by WASM
                     int32_t comp_a,
-                    int32_t comp_b,
-                    int32_t comp_c,
-                    int32_t comp_d,
+                    // int32_t comp_b,
+                    // int32_t comp_c,
+                    // int32_t comp_d,
                 uint32_t scissor_wptr,
                 uint32_t verts_wptr,
                 int nverts,
@@ -322,7 +322,7 @@ public:
 
 
                 // re-construct the struct before we call our underlying code
-                NVGcompositeOperationState comp { comp_a, comp_b, comp_c, comp_d };
+                NVGcompositeOperationState comp { comp_a }; //comp_b, comp_c, comp_d };
 
                 // Call the actual function
                 fn_plain(
