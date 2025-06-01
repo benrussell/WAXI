@@ -205,8 +205,8 @@ public:
 
             ) -> void {
 
-                std::cout << "LinkHelp::nvg_proxy_renderStroke: paint_wptr: 0x" << std::hex << paint_wptr << std::dec << "\n";
-                std::cout << "LinkHelp::nvg_proxy_renderStroke: comp_a: 0x" << std::hex << comp_a << std::dec << "\n";
+                //std::cout << "LinkHelp::nvg_proxy_renderStroke: paint_wptr: 0x" << std::hex << paint_wptr << std::dec << "\n";
+                //std::cout << "LinkHelp::nvg_proxy_renderStroke: comp_a: 0x" << std::hex << comp_a << std::dec << "\n";
 
 
 #if 0
@@ -240,9 +240,11 @@ public:
                 //copy 16 bytes of wasm data from sp
                 std::cout << "LinkHelp::nvg_proxy_renderStroke: rec comp_wptr: 0x" << std::hex << sp_comp_struct << std::dec << "\n";
 
+
+                //FIXME: copy 16 bytes from WASM into this next var
                 // re-construct the struct before we call our underlying code
                 NVGcompositeOperationState comp { comp_a }; // comp_b, comp_c, comp_d };
-                std::cout << "LinkHelp::nvg_proxy_renderStroke: &comp: " << &comp << "\n";
+                //std::cout << "LinkHelp::nvg_proxy_renderStroke: &comp: " << &comp << "\n";
 
                 // Call the actual function
                 fn_plain(
