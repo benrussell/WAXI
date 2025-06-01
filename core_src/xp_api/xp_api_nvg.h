@@ -63,7 +63,7 @@ namespace xp_api
 
             return 1;
         };
-        static int renderCreateTexture(uint64_t uptr, int type, int w, int h, int imageFlags, const unsigned char* data){
+        static int renderCreateTexture(uint64_t uptr, int type, int w, int h, int imageFlags, uint32_t data_wptr){
 
             // data* is going to be a uint32_t for WASM memory space.
             // copy data from wasm to host buffer
@@ -72,7 +72,7 @@ namespace xp_api
             << " type: " << type
             << " w,h: " << w << "," << h
             << " imageFlags: " << imageFlags
-            //<< " data*: " << (uint32_t)data
+            << " data_wptr: " << data_wptr
             << "\n";
             return 1;
         };
@@ -82,27 +82,27 @@ namespace xp_api
             << "\n";
             return 1;
         };
-	    static int renderUpdateTexture(uint64_t uptr, int image, int x, int y, int w, int h, const unsigned char* data){
+	    static int renderUpdateTexture(uint64_t uptr, int image, int x, int y, int w, int h, uint32_t data_wptr){
 
             // data* is going to be a uint32_t for WASM memory space.
             // copy data from wasm to host buffer
 
             std::cout << "waxi/nvg_proxy/renderUpdateTexture: uptr: " << uptr 
-            //<< " type: " << type
+            << " image: " << image
             << " x,y: " << x << "," << y
             << " w,h: " << w << "," << h
-            //<< " imageFlags: " << imageFlags
-            //<< " data*: " << (uint32_t)data
+            << " data_wptr: " << data_wptr
             << "\n";
             return 1;
         };
 
-        static int renderGetTextureSize(uint64_t uptr, int image, int* w, int* h){
+        static int renderGetTextureSize(uint64_t uptr, int image, uint32_t w_wptr, uint32_t h_wptr){
 
             // w and h params are ptrs so we can copy from host nvg into wasm
 
             std::cout << "waxi/nvg_proxy/renderGetTextureSize: uptr: " << uptr
             << "image: " << image
+            << " w_wptr,h_wptr: " << w_wptr << "," << h_wptr
             << "\n";
             return 1;
         };
@@ -122,64 +122,68 @@ namespace xp_api
         
         //almost shared, might work?
         static void      renderFill(uint64_t uptr, 
-            NVGpaint* paint, 
-            NVGcompositeOperationState compositeOperation, 
-            NVGscissor* scissor, 
+            uint32_t paint_wptr, // NVGpaint* paint, 
+            NVGcompositeOperationState compositeOperation, // this is a struct of four ints
+            uint32_t scissor_wptr, //NVGscissor* scissor, 
             float fringe, 
-            const float* bounds, 
-            const NVGpath* paths, int npaths){
+            const uint32_t bounds_wptr, //const float* bounds, 
+            const uint32_t paths_wptr, //const NVGpath* paths,
+            int npaths
+            ){
 
             //bounds is probably an array of float[4]?
 
             std::cout << "waxi/nvg_proxy/renderFill: uptr: " << uptr 
-            //std::cout << "  paint: " << static_cast<void*>(paint) 
+                    << "  paint: " << paint_wptr
             //          << ", compositeOperation: " << compositeOperation 
-            //          << ", scissor: " << static_cast<void*>(scissor) << "\n";
-                      << ", fringe: " << fringe 
-            //std::cout << "  bounds: " << static_cast<const void*>(bounds) 
-            //          << ", paths: " << static_cast<const void*>(paths) 
-                      << ", npaths: " << npaths
-                      << "\n";
+                    << ", scissor: " << scissor_wptr
+                    << ", fringe: " << fringe 
+                    << "  bounds: " << bounds_wptr
+                    << ", paths: " << paths_wptr
+                    << ", npaths: " << npaths
+                    << "\n";
             
         };
         static void    renderStroke(uint64_t uptr, 
-            NVGpaint* paint, 
-            NVGcompositeOperationState compositeOperation,
-            NVGscissor* scissor, 
+            uint32_t paint_wptr, // NVGpaint* paint, 
+            NVGcompositeOperationState compositeOperation, // this is a struct of four ints
+            uint32_t scissor_wptr, //NVGscissor* scissor, 
             float fringe, 
             float strokeWidth, 
-            const NVGpath* paths, int npaths){
+            uint32_t paths_wptr, //const NVGpath* paths, 
+            int npaths
+        ){
 
             std::cout << "waxi/nvg_proxy/renderStroke: uptr: " << uptr 
-            //std::cout << "  paint: " << static_cast<void*>(paint) 
+                    << "  paint: " << paint_wptr
             //          << ", compositeOperation: " << compositeOperation 
-            //          << ", scissor: " << static_cast<void*>(scissor) << "\n";
-                      << ", fringe: " << fringe 
-            //std::cout << "  bounds: " << static_cast<const void*>(bounds) 
-            //          << ", paths: " << static_cast<const void*>(paths) 
-                      << ", npaths: " << npaths
-                      << "\n";
+                    << ", scissor: " << scissor_wptr
+                    << ", fringe: " << fringe 
+                    << ", strokeWidth: " << fringe 
+                    << ", paths_wptr: " << paths_wptr
+                    << ", npaths: " << npaths
+                    << "\n";
 
         };
 
         static void renderTriangles(uint64_t uptr, 
-            NVGpaint* paint, 
-            NVGcompositeOperationState compositeOperation, 
-            NVGscissor* scissor, 
-            const NVGvertex* verts, int nverts, 
-            float fringe ){
+            uint32_t paint_wptr, // NVGpaint* paint, 
+            NVGcompositeOperationState compositeOperation, // this is a struct of four ints
+            uint32_t scissor_wptr, //NVGscissor* scissor, 
+            uint32_t verts_wptr, //const NVGvertex* verts, 
+            int nverts, 
+            float fringe 
+        ){
 
             std::cout << "waxi/nvg_proxy/renderTriangles: uptr: " << uptr 
-            //std::cout << "  paint: " << static_cast<void*>(paint) 
+                    << "  paint: " << paint_wptr
             //          << ", compositeOperation: " << compositeOperation 
-            //          << ", scissor: " << static_cast<void*>(scissor) << "\n";
-                      << ", fringe: " << fringe 
-            //std::cout << "  bounds: " << static_cast<const void*>(bounds) 
-            //          << ", paths: " << static_cast<const void*>(paths) 
-                      << ", nverts: " << nverts
-                      << "\n";
+                    << ", scissor: " << scissor_wptr
+                    << ", verts_wptr: " << verts_wptr
+                    << ", nverts: " << nverts
+                    << ", fringe: " << fringe 
+                    << "\n";
 
- 
         };
         
         //shared
