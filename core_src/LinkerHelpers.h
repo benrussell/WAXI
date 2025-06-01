@@ -205,6 +205,9 @@ public:
 
             ) -> void {
 
+                std::cout << "LinkHelp::nvg_proxy_renderStroke: paint_wptr: 0x" << std::hex << paint_wptr << std::dec << "\n";
+                std::cout << "LinkHelp::nvg_proxy_renderStroke: comp_a: 0x" << std::hex << comp_a << std::dec << "\n";
+
 
 #if 0
                 // Get memory from the caller
@@ -230,8 +233,16 @@ public:
 #endif
 
 
+                //WASM gives us a struct param by giving us a ptr to the end of its mem block
+                size_t szComp = sizeof( NVGcompositeOperationState );
+                uint32_t sp_comp_struct = comp_a - szComp;
+
+                //copy 16 bytes of wasm data from sp
+                std::cout << "LinkHelp::nvg_proxy_renderStroke: rec comp_wptr: 0x" << std::hex << sp_comp_struct << std::dec << "\n";
+
                 // re-construct the struct before we call our underlying code
                 NVGcompositeOperationState comp { comp_a }; // comp_b, comp_c, comp_d };
+                std::cout << "LinkHelp::nvg_proxy_renderStroke: &comp: " << &comp << "\n";
 
                 // Call the actual function
                 fn_plain(

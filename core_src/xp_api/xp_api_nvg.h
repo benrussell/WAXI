@@ -161,7 +161,7 @@ namespace xp_api
 
             std::cout << "waxi/nvg_proxy/renderStroke: uptr: " << uptr 
                     << "  paint: " << paint_wptr
-            //          << ", compositeOperation: " << compositeOperation 
+                    << ", compositeOperation: " << &compositeOperation 
                     << ", scissor: " << scissor_wptr
                     << ", fringe: " << fringe 
                     << ", strokeWidth: " << fringe 
@@ -171,7 +171,7 @@ namespace xp_api
 
         };
 
-        
+
         static void renderTriangles(
             uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
