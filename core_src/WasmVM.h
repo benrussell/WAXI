@@ -388,9 +388,9 @@ public:
 
 
 
-
-private:
+public:
 	NvgProxy* m_nvgProxy;
+private:
 
 	wasmtime::Store *m_store;
 	wasmtime::Instance *m_instance;

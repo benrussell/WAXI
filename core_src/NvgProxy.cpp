@@ -118,16 +118,59 @@ NvgProxy::~NvgProxy(){
 
 
 
-void NvgProxy::init(wasmtime::Linker &linker, wasmtime::Store *store){
-    
-    std::cout << "waxi/ Init WAXI/ nvg proxy - NOOP!" << std::endl;
-    // provide some host fns
 
-    {
-    // // std::cout << ">> api/ export dref module" << std::endl;
-    // auto res3 = LinkHelp::wrap_and_expose_caller_charptr(linker,               "waxi_dref@1", "find", xp_api::dref::find);
-    // auto res4 = LinkHelp::wrap(linker, xp_api::dref::getFloat,      "waxi_dref@1", "getFloat");
-    // auto res5 = LinkHelp::wrap(linker, xp_api::dref::setFloat,      "waxi_dref@1", "setFloat");
-    }
+
+void NvgProxy::draw_test(){
+
+    auto lam_drawRose = [](auto vg){
+// Draw tick marks around a circle
+		float centerX = 400 / 2;
+		float centerY = 400 / 2;
+		float radius = 50;
+		float tickLength = 20;
+
+
+		// Save the current transformation state
+		nvgSave(vg);
+
+		// Translate to the center of the circle
+		nvgTranslate(vg, centerX, centerY);
+
+		// Apply the rotation transformation
+		//nvgRotate(vg, dr_heading->getFloat());
+        nvgRotate(vg, 7.f);
+
+		// Translate back to the original position
+		nvgTranslate(vg, -centerX, -centerY);
+
+		for (int i = 0; i < 12; ++i) {
+			float angle = (i / 12.0f) * NVG_PI * 2;
+			float x1 = centerX + cos(angle) * radius;
+			float y1 = centerY + sin(angle) * radius;
+			float x2 = centerX + cos(angle) * (radius - tickLength);
+			float y2 = centerY + sin(angle) * (radius - tickLength);
+
+			nvgBeginPath(vg);
+			nvgMoveTo(vg, x1, y1);
+			nvgLineTo(vg, x2, y2);
+			//nvgStrokeColor(vg, nvgRGBA(255, 192, 0, 255));
+            nvgStrokeColor(vg, nvgRGBA(255, 0, 255, 255));
+			nvgStrokeWidth(vg, 15.0f);
+			nvgStroke(vg);
+		}
+
+		nvgRestore(vg);
+
+	};
+
+    
+    std::cout << "NvgProxy::draw_test() nvg draw..\n";
+    nvgBeginFrame( m_vg, 400, 400, 1.f );
+        lam_drawRose(m_vg);
+    nvgEndFrame( m_vg );
+
+
 
 }
+
+

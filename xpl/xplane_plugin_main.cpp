@@ -23,6 +23,33 @@ WasmVM* global_WasmVM;
 
 
 
+#include <XPLMDisplay.h>
+
+int drawCallback(XPLMDrawingPhase inPhase, int inIsBefore, void* inRefcon) {
+    // Example: Perform drawing only during the Window Drawing phase
+
+    std::cout << "xplane_plugin_main / drawCallback hack\n";
+
+    xp_api::gfx::draw_dbg_tri_core( 50, 50 );
+
+    global_WasmVM->m_nvgProxy->draw_test();
+
+    if (inPhase == xplm_Phase_Window) {
+        // Insert OpenGL drawing code here if needed, for example:
+        // glColor3f(1.0f, 0.0f, 0.0f);
+        // glBegin(GL_TRIANGLES);
+        // glVertex2f(0.0f, 0.0f);
+        // glVertex2f(1.0f, 0.0f);
+        // glVertex2f(0.5f, 1.0f);
+        // glEnd();
+    }
+    return 1; // Returning non-zero means to continue receiving callbacks.
+}
+
+
+
+
+
 
 
 
@@ -169,6 +196,9 @@ PLUGIN_API void XPluginStop(void) {
 PLUGIN_API int XPluginEnable(void) {
 
     //RegisterPanelDrawCallback();
+
+    XPLMRegisterDrawCallback(drawCallback, 
+        xplm_Phase_Window, 0, nullptr);
 
     // Code to enable the plugin
     return global_WasmVM->call_plugin_enable();;

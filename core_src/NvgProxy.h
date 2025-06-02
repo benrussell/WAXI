@@ -35,7 +35,7 @@ class NvgProxy{
 
     //void export_to_wasm();
 
-    void init(wasmtime::Linker &linker, wasmtime::Store *store);
+    void draw_test();
 
 
 };
