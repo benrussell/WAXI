@@ -112,7 +112,9 @@ namespace xp_api
         };
 
 
-	    static int renderUpdateTexture(uint64_t uptr, int image, int x, int y, int w, int h, uint32_t data_wptr){
+	    
+        // wasm mem io
+        static int renderUpdateTexture(uint64_t uptr, int image, int x, int y, int w, int h, uint32_t data_wptr){
             // data* is going to be a uint32_t for WASM memory space.
             // copy data from wasm to host buffer
             std::cout << "waxi/nvg_proxy/renderUpdateTexture: uptr: " << uptr 
@@ -125,6 +127,7 @@ namespace xp_api
         };
 
 
+        // wasm mem io
         static int renderGetTextureSize(uint64_t uptr, int image, uint32_t w_wptr, uint32_t h_wptr){
             // w and h params are ptrs so we can copy from host nvg into wasm
             std::cout << "waxi/nvg_proxy/renderGetTextureSize: uptr: " << uptr
@@ -149,14 +152,17 @@ namespace xp_api
             late_bind_renderCancel((void*)uptr);
         };
 
-        
+
         static void renderFlush(uint64_t uptr){
             std::cout << "waxi/nvg_proxy/renderFlush: uptr: " << uptr << "\n";
             late_bind_renderFlush((void*)uptr);
         };
         
 
-        //almost shared, might work?
+
+
+
+        // wasm mem io
         static void      renderFill(
             uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
@@ -183,6 +189,7 @@ namespace xp_api
         };
 
 
+        // wasm mem io
         static void    renderStroke(
             uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
@@ -207,6 +214,7 @@ namespace xp_api
         };
 
 
+        // wasm mem io
         static void renderTriangles(
             uint64_t uptr, 
             uint32_t paint_wptr, // NVGpaint* paint, 
@@ -229,7 +237,9 @@ namespace xp_api
         };
         
 
-        //shared
+
+
+
         static void renderDelete(uint64_t uptr){
             std::cout << "waxi/nvg_proxy/renderDelete: uptr: " << uptr << "\n";
             late_bind_renderDelete((void*)uptr);
