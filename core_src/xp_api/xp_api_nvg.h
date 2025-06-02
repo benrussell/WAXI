@@ -139,6 +139,7 @@ namespace xp_api
             std::cout << "waxi/nvg_proxy/renderViewport: uptr: " << uptr
                       << " width: " << width << ", height: " << height
                       << ", devicePixelRatio: " << devicePixelRatio << "\n";
+            late_bind_renderViewport((void*)uptr, width, height, devicePixelRatio);
         };
         
 
