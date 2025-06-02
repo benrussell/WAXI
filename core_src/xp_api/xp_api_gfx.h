@@ -23,11 +23,7 @@ namespace xp_api
     class gfx
     {
     public:
-        static void draw_dbg_tri(Caller caller, int x, int y)
-        {
-            //std::cout << "waxi/api/ gfx_draw_dbg_tri(" << x << "," << y << ")" << std::endl;
-
-
+        static void draw_dbg_tri_core( int x, int y ){
                 glDisable( GL_CULL_FACE );
 
                 glPushMatrix();
@@ -51,7 +47,14 @@ namespace xp_api
 
 
                 glEnable( GL_CULL_FACE );
+        }
 
+
+        static void draw_dbg_tri(Caller caller, int x, int y)
+        {
+            //std::cout << "waxi/api/ gfx_draw_dbg_tri(" << x << "," << y << ")" << std::endl;
+
+            draw_dbg_tri_core( x, y );
 
 
             #if 0
