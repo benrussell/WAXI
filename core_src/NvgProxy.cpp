@@ -35,8 +35,8 @@ NvgProxy::NvgProxy(){
 	if (gl == NULL) goto error;
 	memset(gl, 0, sizeof(struct GLNVGcontext));
 
-    printf("waxi/NvgProxy/ctor late bind glnvg__renderCreate ptr: %p\n", glnvg__renderCreate);
-    printf("waxi/NvgProxy/ctor GLNVGcontext ptr: %lu\n", gl);
+    //printf("waxi/NvgProxy/ctor late bind glnvg__renderCreate ptr: %p\n", glnvg__renderCreate);
+    //printf("waxi/NvgProxy/ctor GLNVGcontext ptr: %lu\n", gl);
 
     m_gl_ptr = (uint64_t)gl; //FIXME: This is a hack but its the magic we needed to get the correct contexxt in/out of WASM.
 
@@ -72,7 +72,7 @@ NvgProxy::NvgProxy(){
 	//return ctx;
     m_vg = ctx;
 
-    printf("NvgProxy created a new new context @: %lu\n", m_vg);
+    //printf("NvgProxy created a new new context @: %lu\n", m_vg);
 
     if (m_vg == nullptr) {
 		std::cout << " Init nvg: FAILED\n";
