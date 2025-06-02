@@ -78,7 +78,7 @@ namespace xp_api
 
     //the ptrs here cross the WASM memory boundary and need book keeping
         static int renderCreate( uint64_t uptr ){
-            std::cout << "waxi/nvg_proxy/renderCreate: uptr: " << uptr << "\n";
+            // std::cout << "waxi/nvg_proxy/renderCreate: uptr: " << uptr << "\n";
             return late_bind_renderCreate((void*)uptr);
         };
 
@@ -87,27 +87,31 @@ namespace xp_api
             // data* is going to be a uint32_t for WASM memory space.
             // copy data from wasm to host buffer
 
-            std::cout << "waxi/nvg_proxy/renderCreateTexture: uptr: " << uptr 
+            std::cout << "??waxi/nvg_proxy/renderCreateTexture: uptr: " << uptr 
             << " type: " << type
             << " w,h: " << w << "," << h
             << " imageFlags: " << imageFlags
             << " data_wptr: " << data_wptr
             << "\n";
 
-            return late_bind_renderCreateTexture(
+            int ret = late_bind_renderCreateTexture(
                 (void*)uptr,
                 type,
                 w, h,
                 imageFlags,
                 0 //data_wptr //FIXME: this is broken. need to copy out of WASM memory!
             );
+
+            std::cout << "waxi/nvg_proxy/renderCreateTexture: ret: " << ret << "\n";
+
+            return ret;
         };
 
 
 	    static int renderDeleteTexture(uint64_t uptr, int image){
-            std::cout << "waxi/nvg_proxy/renderDeleteTexture: uptr: " << uptr
-            << "image: " << image
-            << "\n";
+            // std::cout << "waxi/nvg_proxy/renderDeleteTexture: uptr: " << uptr
+            // << "image: " << image
+            // << "\n";
             return late_bind_renderDeleteTexture((void*)uptr, image);
         };
 
@@ -117,7 +121,7 @@ namespace xp_api
         static int renderUpdateTexture(uint64_t uptr, int image, int x, int y, int w, int h, uint32_t data_wptr){
             // data* is going to be a uint32_t for WASM memory space.
             // copy data from wasm to host buffer
-            std::cout << "waxi/nvg_proxy/renderUpdateTexture: uptr: " << uptr 
+            std::cout << "!!waxi/nvg_proxy/renderUpdateTexture: uptr: " << uptr 
             << " image: " << image
             << " x,y: " << x << "," << y
             << " w,h: " << w << "," << h
@@ -130,7 +134,7 @@ namespace xp_api
         // wasm mem io
         static int renderGetTextureSize(uint64_t uptr, int image, uint32_t w_wptr, uint32_t h_wptr){
             // w and h params are ptrs so we can copy from host nvg into wasm
-            std::cout << "waxi/nvg_proxy/renderGetTextureSize: uptr: " << uptr
+            std::cout << "!!waxi/nvg_proxy/renderGetTextureSize: uptr: " << uptr
             << "image: " << image
             << " w_wptr,h_wptr: " << w_wptr << "," << h_wptr
             << "\n";
@@ -139,22 +143,22 @@ namespace xp_api
 
 
         static void      renderViewport(uint64_t uptr, float width, float height, float devicePixelRatio){
-            std::cout << "waxi/nvg_proxy/renderViewport: uptr: " << uptr
-                      << " width: " << width << ", height: " << height
-                      << ", devicePixelRatio: " << devicePixelRatio << "\n";
+            // std::cout << "waxi/nvg_proxy/renderViewport: uptr: " << uptr
+            //           << " width: " << width << ", height: " << height
+            //           << ", devicePixelRatio: " << devicePixelRatio << "\n";
             late_bind_renderViewport((void*)uptr, width, height, devicePixelRatio);
         };
         
 
         //shared
         static void renderCancel(uint64_t uptr){
-            std::cout << "waxi/nvg_proxy/renderCancel: uptr: " << uptr << "\n";
+            // std::cout << "waxi/nvg_proxy/renderCancel: uptr: " << uptr << "\n";
             late_bind_renderCancel((void*)uptr);
         };
 
 
         static void renderFlush(uint64_t uptr){
-            std::cout << "waxi/nvg_proxy/renderFlush: uptr: " << uptr << "\n";
+            // std::cout << "waxi/nvg_proxy/renderFlush: uptr: " << uptr << "\n";
             late_bind_renderFlush((void*)uptr);
         };
         
@@ -176,7 +180,7 @@ namespace xp_api
 
             //bounds is probably an array of float[4]?
 
-            std::cout << "waxi/nvg_proxy/renderFill: uptr: " << uptr 
+            std::cout << "!!waxi/nvg_proxy/renderFill: uptr: " << uptr 
                     << "  paint: " << paint_wptr
             //          << ", compositeOperation: " << compositeOperation 
                     << ", scissor: " << scissor_wptr
@@ -192,24 +196,37 @@ namespace xp_api
         // wasm mem io
         static void    renderStroke(
             uint64_t uptr, 
-            uint32_t paint_wptr, // NVGpaint* paint, 
+            uint64_t paint_wptr, // NVGpaint* paint, 
             NVGcompositeOperationState compositeOperation, // this is a struct of four ints
-            uint32_t scissor_wptr, //NVGscissor* scissor, 
+            uint64_t scissor_wptr, //NVGscissor* scissor, 
             float fringe, 
             float strokeWidth, 
-            uint32_t paths_wptr, //const NVGpath* paths, 
+            uint64_t paths_wptr, //const NVGpath* paths, 
             int npaths
         ){
 
-            std::cout << "waxi/nvg_proxy/renderStroke: uptr: " << uptr 
-                    << "  paint: " << paint_wptr
-                    << ", compositeOperation: " << &compositeOperation 
-                    << ", scissor: " << scissor_wptr
-                    << ", fringe: " << fringe 
-                    << ", strokeWidth: " << fringe 
-                    << ", paths_wptr: " << paths_wptr
-                    << ", npaths: " << npaths
-                    << "\n";
+            //memory pointers are finessed by the code in LinkHelp::wrap_......()
+
+            // std::cout << "waxi/nvg_proxy/renderStroke: uptr: " << uptr 
+            //         << "  paint: " << paint_wptr
+            //         << ", compositeOperation: " << &compositeOperation 
+            //         << ", scissor: " << scissor_wptr
+            //         << ", fringe: " << fringe 
+            //         << ", strokeWidth: " << fringe 
+            //         << ", paths_wptr: " << paths_wptr
+            //         << ", npaths: " << npaths
+            //         << "\n";
+
+            late_bind_renderStroke(
+                (void*)uptr,
+                (NVGpaint*)paint_wptr,
+                compositeOperation,
+                (NVGscissor*)scissor_wptr,
+                fringe,
+                strokeWidth,
+                (NVGpath*)paths_wptr,
+                npaths
+            );
 
         };
 
@@ -225,7 +242,7 @@ namespace xp_api
             float fringe 
         ){
 
-            std::cout << "waxi/nvg_proxy/renderTriangles: uptr: " << uptr 
+            std::cout << "!!waxi/nvg_proxy/renderTriangles: uptr: " << uptr 
                     << "  paint: " << paint_wptr
             //          << ", compositeOperation: " << compositeOperation 
                     << ", scissor: " << scissor_wptr

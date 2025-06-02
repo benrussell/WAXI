@@ -80,6 +80,8 @@ public:
 
 
 
+    // wasm memory io for renderFill Stroke and Triangles needs
+    // to be sorted
 
     static auto wrap_nvg_proxy_renderFill(
             wasmtime::Linker &linker, 
@@ -175,12 +177,12 @@ public:
             const std::string &name,
             void(*fn_plain)(
                 uint64_t uptr,
-                uint32_t paint_wptr,
+                uint64_t paint_wptr,
                 NVGcompositeOperationState comp,
-                uint32_t scissor_wptr,
+                uint64_t scissor_wptr,
                 float fringe,
                 float strokeWidth,
-                uint32_t paths_wptr,
+                uint64_t paths_wptr,
                 int npaths
             ) //signature that we need to wrap
         ) {
@@ -209,7 +211,6 @@ public:
                 //std::cout << "LinkHelp::nvg_proxy_renderStroke: comp_a: 0x" << std::hex << comp_a << std::dec << "\n";
 
 
-#if 0
                 // Get memory from the caller
                 auto memory_export = caller.get_export("memory");
                 if (!memory_export || !std::holds_alternative<wasmtime::Memory>(*memory_export)) {
@@ -218,10 +219,10 @@ public:
                 }
                 auto memory = &std::get<wasmtime::Memory>(*memory_export);
 
-
-                // Read the string from WASM memory
+                // Get a handle to the WASM memory block.
                 auto mem_data = memory->data(caller);
-                
+
+                #if 0
                 //calc the size of the c_str we're being passed.
                 size_t len = 0;
                 while ((ptr + len) < mem_data.size() && mem_data[ptr + len] != '\0') {
@@ -230,7 +231,7 @@ public:
 
                 std::vector<char> buf(len + 1, 0);
                 std::memcpy(buf.data(), mem_data.data() + ptr, len);
-#endif
+                #endif
 
 
                 //WASM gives us a struct param by giving us a ptr to the end of its mem block
@@ -238,23 +239,25 @@ public:
                 uint32_t sp_comp_struct = comp_a - szComp;
 
                 //copy 16 bytes of wasm data from sp
-                std::cout << "LinkHelp::nvg_proxy_renderStroke: rec comp_wptr: 0x" << std::hex << sp_comp_struct << std::dec << "\n";
+                //std::cout << "LinkHelp::nvg_proxy_renderStroke: rec comp_wptr: 0x" << std::hex << sp_comp_struct << std::dec << "\n";
+
+                uint64_t wasm_mem_ptr = (uint64_t)mem_data.data();
 
 
                 //FIXME: copy 16 bytes from WASM into this next var
                 // re-construct the struct before we call our underlying code
-                NVGcompositeOperationState comp { comp_a }; // comp_b, comp_c, comp_d };
+                NVGcompositeOperationState* comp_ptr = (NVGcompositeOperationState*)(wasm_mem_ptr + sp_comp_struct);
                 //std::cout << "LinkHelp::nvg_proxy_renderStroke: &comp: " << &comp << "\n";
 
                 // Call the actual function
                 fn_plain(
                     uptr,
-                    paint_wptr, 
-                    comp,
-                    scissor_wptr,
+                    wasm_mem_ptr + paint_wptr,
+                    *comp_ptr,
+                    wasm_mem_ptr + scissor_wptr,
                     fringe,
                     strokeWidth,
-                    paths_wptr,
+                    wasm_mem_ptr + paths_wptr,
                     npaths
                 );
             }
