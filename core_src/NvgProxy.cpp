@@ -164,7 +164,7 @@ void NvgProxy::draw_test(){
 	};
 
     
-    std::cout << "NvgProxy::draw_test() nvg draw..\n";
+    //std::cout << "NvgProxy::draw_test() nvg draw..\n";
     nvgBeginFrame( m_vg, 400, 400, 1.f );
         lam_drawRose(m_vg);
     nvgEndFrame( m_vg );

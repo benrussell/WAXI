@@ -28,7 +28,7 @@ WasmVM* global_WasmVM;
 int drawCallback(XPLMDrawingPhase inPhase, int inIsBefore, void* inRefcon) {
     // Example: Perform drawing only during the Window Drawing phase
 
-    std::cout << "xplane_plugin_main / drawCallback hack\n";
+    //std::cout << "xplane_plugin_main / drawCallback hack\n";
 
     xp_api::gfx::draw_dbg_tri_core( 50, 50 );
 
