@@ -1,9 +1,17 @@
 {
-    "name": "wasm_xpl template",
-    "sig": "wasm_xpl/template_sig",
-    "desc": "wasm_xpl config example",
+    "name": "WAXI Default Config",
+    "sig": "x-plugins.com/waxi/default_config",
+    "desc": "WAXI Config Template",
+    "log_id": "wxdef",
 
-    "wasm_filename": "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm",
+    "basic_wasm_filename": "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_basic/build/wasm_plugin_basic.wasm",
+    "wasm_filename": "/home/br/Dev/wasm/wasm_plugin/wasm_plugin_nvg/build/wasm_plugin_nvg.wasm",
+
+
+    "vfs_docs": [
+        ""
+    ],
+
 
     "vfs":[
         ["{plugin_root}/vfs_root/", "/"],
@@ -11,7 +19,7 @@
         ["{xp_root}/", "/X-Plane"],
         ["{plugin_root}/vfs_lock/", "/X-Plane/Aircraft"],
         ["{plugin_root}/vfs_lock/", "/X-Plane/Resources/plugins"],
-        
+
         ["{xp_root}/{acf_root}", "/Aircraft"],
         ["{plugin_root}/vfs_lock", "/Aircraft/plugins"],
 
