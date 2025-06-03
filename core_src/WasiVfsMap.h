@@ -42,7 +42,7 @@ class WasiVfsMap{
 		std::cout << "waxi/  VFS  {acf_root}   : " << path_config.acf_folder << std::endl;
 
         /*
-        VFS definition in the config.json looks like this:
+        VFS definition in the waxi_config.json looks like this:
 
         "vfs":[
                 ["{plugin_root}/vfs_root/", "/"],
@@ -66,10 +66,10 @@ class WasiVfsMap{
 		VFS_record_set vfs_fstab_tpl;
 		
 
-		std::string config_json_filename = path_config.plugin_folder + "/config.json";
+		std::string config_json_filename = path_config.plugin_folder + "/waxi_config.json";
 		//std::cout << "waxi/ WasiVfsMap/ dyn config json fn: " + config_json_filename + "\n";
 
-		// Load configuration from config.json
+		// Load configuration from waxi_config.json
 		std::ifstream configFile(config_json_filename);
 		if (configFile.is_open()) {
 			try {
@@ -82,23 +82,23 @@ class WasiVfsMap{
 							std::string mount = vfs_entry[1].get<std::string>();
 							vfs_fstab_tpl.rs.emplace_back(VFS_record(target, mount));
 						} else {
-							std::cerr << "waxi/ Invalid VFS entry format in config.json\n";
+							std::cerr << "waxi/ Invalid VFS entry format in waxi_config.json\n";
 						}
 					}
 				} else {
-					throw std::runtime_error("waxi/ Missing or invalid 'vfs' definition in config.json");
+					throw std::runtime_error("waxi/ Missing or invalid 'vfs' definition in waxi_config.json");
 				}
 
 
-				//std::cout << "waxi/ Loaded configuration from config.json\n";
+				//std::cout << "waxi/ Loaded configuration from waxi_config.json\n";
 			} catch (const std::exception &e) {
-				std::cerr << "waxi/ Error parsing config.json: " << e.what() << "\n";
-				throw std::runtime_error(std::string("waxi/ Error parsing config.json: ") + e.what());
+				std::cerr << "waxi/ Error parsing waxi_config.json: " << e.what() << "\n";
+				throw std::runtime_error(std::string("waxi/ Error parsing waxi_config.json: ") + e.what());
 				
 			}
 		} else {
-			std::cerr << "waxi/ Could not open config.json\n";
-			throw std::runtime_error("waxi/ Could not open config.json\n");
+			std::cerr << "waxi/ Could not open waxi_config.json\n";
+			throw std::runtime_error("waxi/ Could not open waxi_config.json\n");
 		}
 
 		

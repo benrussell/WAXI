@@ -119,10 +119,10 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
 
     std::string wasm_filename;
 
-    std::string config_json_filename = config.plugin_folder + "/config.json";
-    std::cout << "waxi/ config.json: [" + config_json_filename + "]\n";
+    std::string config_json_filename = config.plugin_folder + "/waxi_config.json";
+    std::cout << "waxi/ waxi_config.json: [" + config_json_filename + "]\n";
 
-    // Load configuration from config.json
+    // Load configuration from waxi_config.json
     std::ifstream configFile(config_json_filename);
     if (configFile.is_open()) {
         try {
@@ -140,7 +140,7 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
             if (jsonConfig.contains("desc")) {
                 desc = jsonConfig["desc"].get<std::string>();
             }
-            std::cout << "waxi/ config.json: name:[" << name << "]  sig:[" << sig << "]  desc:[" << desc << "]\n";
+            std::cout << "waxi/ waxi_config.json: name:[" << name << "]  sig:[" << sig << "]  desc:[" << desc << "]\n";
             
 
             if (jsonConfig.contains("wasm_filename")) {
@@ -149,13 +149,13 @@ PLUGIN_API int XPluginStart(char *outName, char *outSig, char *outDesc) {
             }
 
 
-            //std::cout << "waxi/ Loaded configuration from config.json\n";
+            //std::cout << "waxi/ Loaded configuration from waxi_config.json\n";
         } catch (const std::exception &e) {
-            std::cerr << "waxi/ Error parsing config.json: " << e.what() << "\n";
+            std::cerr << "waxi/ Error parsing waxi_config.json: " << e.what() << "\n";
             return 0;
         }
     } else {
-        std::cerr << "waxi/ Could not open config.json\n";
+        std::cerr << "waxi/ Could not open waxi_config.json\n";
         return 0;
     }
 
