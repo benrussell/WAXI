@@ -10,18 +10,18 @@ set( INC_GLEW
         third_party/glew-2.2.0/include
 )
 
-
 set( INC_JSON 
         third_party/json-develop/include
 )
-
 
 set( INC_NVG
         third_party/nanovg-master/src
 )
 
-# X-Planen Mac only gives us GL2.1
+
+# X-Plane Mac only gives us GL2.1
 add_definitions( -DNANOVG_GL2=1 -DNANOVG_GL_IMPLEMENTATION=1 )
+
 
 set( NVG_ROOT third_party/nanovg-master/src )
 set( NVG_SRC
