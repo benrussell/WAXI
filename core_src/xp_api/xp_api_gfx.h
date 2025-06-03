@@ -10,7 +10,7 @@
 
 // #include "WasmVM.h"
 
-#include "LinkerHelpers.h"
+#include "LinkHelp.h"
 
 
 #include <GL/glew.h>

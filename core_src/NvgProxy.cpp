@@ -18,7 +18,7 @@
 #include <iomanip>
 
 
-#include "LinkerHelpers.h" //FIXME: rename this file
+#include "LinkHelp.h" //FIXME: rename this file
 
 using namespace wasmtime;
 
@@ -155,7 +155,7 @@ void NvgProxy::draw_test(){
 			nvgLineTo(vg, x2, y2);
 			//nvgStrokeColor(vg, nvgRGBA(255, 192, 0, 255));
             nvgStrokeColor(vg, nvgRGBA(255, 0, 255, 255));
-			nvgStrokeWidth(vg, 15.0f);
+			nvgStrokeWidth(vg, 10.0f);
 			nvgStroke(vg);
 		}
 

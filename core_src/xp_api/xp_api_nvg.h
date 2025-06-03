@@ -10,14 +10,15 @@
 
 // #include "WasmVM.h"
 
-#include "LinkerHelpers.h"
+#include "LinkHelp.h"
 
 
 #include "nanovg.h"
 
 
 
-
+// Functions in this file are the first line of handlers when WASM calls for nvg core.
+// Some of the functions here are custom wrapped by helper fns in LinkHelp.h
 
 
 using namespace wasmtime;
@@ -41,8 +42,8 @@ namespace xp_api
 
 
 
-
-
+        // We have a bunch of late-bind fn ptrs that we steal from an NVG GL instance
+        // hackish but functional.
         /*            
             Obvious solution:
             #define NANOVG_GL2_IMPLEMENTATION 1

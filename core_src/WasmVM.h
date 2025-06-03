@@ -216,8 +216,6 @@ public:
 		find_and_save_func(m_wfn_plugin_disable, "plugin_disable");
 		find_and_save_func(m_wfn_plugin_message, "plugin_message");
 
-		find_and_save_func(m_wfn_plugin_flcb_proxy, "plugin_flcb_proxy");
-
 		// - plugin_update() ?
 		// - plugin_flightloop()
 		// - plugin_draw() - should we add a bunch specifically for avionics?
@@ -408,7 +406,6 @@ private:
 	std::optional<wasmtime::Func> m_wfn_plugin_disable;
 	std::optional<wasmtime::Func> m_wfn_plugin_message;
 
-	std::optional<wasmtime::Func> m_wfn_plugin_flcb_proxy; //FIXME: might not need this, can we resolve fptr from host?
 
 	//FIXME: we prob want to store this for logging etc?
 	// These are passed back to the host caller fn.
@@ -416,7 +413,7 @@ private:
 	// char outSig[256]{};
 	// char outDesc[256]{};
 
-	std::vector<uint8_t> read_file(const std::string &filename)
+	static std::vector<uint8_t> read_file(const std::string &filename)
 	{
 
 		// Load the WASM module
@@ -433,7 +430,7 @@ private:
 		{
 			std::cerr << "waxi/ Failed to read WASM file" << std::endl;
 			// return 1;
-			throw std::runtime_error("waxi/ Failed to read WASM file [" + filename + "]");
+			throw std::runtime_error("waxi/ Failed to read WASM file  [" + filename + "]");
 		}
 
 		return wasm_bytes;

@@ -9,7 +9,7 @@
 
 // #include "WasmVM.h"
 
-#include "LinkerHelpers.h"
+#include "LinkHelp.h"
 
 
 

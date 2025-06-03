@@ -10,7 +10,7 @@
 #include <iomanip>
 
 
-#include "LinkerHelpers.h" //FIXME: rename this file
+#include "LinkHelp.h" //FIXME: rename this file
 
 
 using namespace wasmtime;
