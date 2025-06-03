@@ -190,15 +190,14 @@ public:
             mod, name,
             // We're using a lambda closure here to augment the functionality.
             //ptrs into wasm memory space are only 32bit
+            //this sig needs to match WASM
             [fn_plain](
                 Caller caller, 
                 uint64_t uptr,
                 uint32_t paint_wptr,
                 //NVGcompositeOperationState comp, - destrctured into four ints by WASM
                     int32_t comp_a,
-                    // int32_t comp_b,
-                    // int32_t comp_c,
-                    // int32_t comp_d,
+
                 uint32_t scissor_wptr,
                 float fringe,
                 float strokeWidth,
@@ -210,7 +209,6 @@ public:
                 //std::cout << "LinkHelp::nvg_proxy_renderStroke: paint_wptr: 0x" << std::hex << paint_wptr << std::dec << "\n";
                 //std::cout << "LinkHelp::nvg_proxy_renderStroke: comp_a: 0x" << std::hex << comp_a << std::dec << "\n";
 
-
                 // Get memory from the caller
                 auto memory_export = caller.get_export("memory");
                 if (!memory_export || !std::holds_alternative<wasmtime::Memory>(*memory_export)) {
@@ -218,46 +216,40 @@ public:
                     return;
                 }
                 auto memory = &std::get<wasmtime::Memory>(*memory_export);
-
                 // Get a handle to the WASM memory block.
                 auto mem_data = memory->data(caller);
-
-                #if 0
-                //calc the size of the c_str we're being passed.
-                size_t len = 0;
-                while ((ptr + len) < mem_data.size() && mem_data[ptr + len] != '\0') {
-                    ++len;
-                }
-
-                std::vector<char> buf(len + 1, 0);
-                std::memcpy(buf.data(), mem_data.data() + ptr, len);
-                #endif
+                uint64_t wasm_mem_ptr = (uint64_t)mem_data.data();
 
 
-                //WASM gives us a struct param by giving us a ptr to the end of its mem block
-                size_t szComp = sizeof( NVGcompositeOperationState );
-                uint32_t sp_comp_struct = comp_a - szComp;
-
-                //copy 16 bytes of wasm data from sp
                 //std::cout << "LinkHelp::nvg_proxy_renderStroke: rec comp_wptr: 0x" << std::hex << sp_comp_struct << std::dec << "\n";
 
-                uint64_t wasm_mem_ptr = (uint64_t)mem_data.data();
+                //WASM gives us a struct param by giving us a ptr to the end of its mem block
+                //calc 16 bytes of offset
+                uint32_t comp_struct_wptr = comp_a - sizeof( NVGcompositeOperationState );
+
+
+                //recalc all ptrs in host memory space by taking the WASM memory block base address and adding offset
+                uint64_t comp_struct_ptr = wasm_mem_ptr + comp_struct_wptr;
+                uint64_t paint_ptr = wasm_mem_ptr + paint_wptr;
+                uint64_t scissor_ptr = wasm_mem_ptr + scissor_wptr;
+                uint64_t paths_ptr = wasm_mem_ptr + paths_wptr;
 
 
                 //FIXME: copy 16 bytes from WASM into this next var
                 // re-construct the struct before we call our underlying code
-                NVGcompositeOperationState* comp_ptr = (NVGcompositeOperationState*)(wasm_mem_ptr + sp_comp_struct);
+                auto comp_ptr = (NVGcompositeOperationState*)comp_struct_ptr;
                 //std::cout << "LinkHelp::nvg_proxy_renderStroke: &comp: " << &comp << "\n";
 
                 // Call the actual function
+                //fn_plain maps to late_bind_renderStroke which we get from our host NVG GL instance.
                 fn_plain(
                     uptr,
-                    wasm_mem_ptr + paint_wptr,
+                    paint_ptr,
                     *comp_ptr,
-                    wasm_mem_ptr + scissor_wptr,
+                    scissor_ptr,
                     fringe,
                     strokeWidth,
-                    wasm_mem_ptr + paths_wptr,
+                    paths_ptr,
                     npaths
                 );
             }
@@ -353,12 +345,6 @@ public:
             }
         );
     }
-
-
-
-
-
-
 
 
 

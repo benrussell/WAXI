@@ -1,17 +1,8 @@
 #ifndef XP_API_NVG_H
 #define XP_API_NVG_H
 
-#include <fstream>
 #include <iostream>
-#include <sstream>
 #include <wasmtime.hh>
-#include <cstring>
-#include <iomanip>
-
-// #include "WasmVM.h"
-
-#include "LinkHelp.h"
-
 
 #include "nanovg.h"
 
@@ -197,12 +188,12 @@ namespace xp_api
         // wasm mem io
         static void    renderStroke(
             uint64_t uptr, 
-            uint64_t paint_wptr, // NVGpaint* paint, 
+            uint64_t paint_ptr, // NVGpaint* paint,
             NVGcompositeOperationState compositeOperation, // this is a struct of four ints
-            uint64_t scissor_wptr, //NVGscissor* scissor, 
+            uint64_t scissor_ptr, //NVGscissor* scissor,
             float fringe, 
             float strokeWidth, 
-            uint64_t paths_wptr, //const NVGpath* paths, 
+            uint64_t paths_ptr, //const NVGpath* paths,
             int npaths
         ){
 
@@ -220,12 +211,12 @@ namespace xp_api
 
             late_bind_renderStroke(
                 (void*)uptr,
-                (NVGpaint*)paint_wptr,
+                (NVGpaint*)paint_ptr,
                 compositeOperation,
-                (NVGscissor*)scissor_wptr,
+                (NVGscissor*)scissor_ptr,
                 fringe,
                 strokeWidth,
-                (NVGpath*)paths_wptr,
+                (NVGpath*)paths_ptr,
                 npaths
             );
 
