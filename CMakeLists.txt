@@ -28,16 +28,8 @@ set( USE_LIBS
 
 
 subdirs( 
-        #"cli"  # Use XPL_WorkBench.
         "xpl"
         )
-
-
-# add_executable(wasm_host
-#         cli/main.cpp
-#         )
-
-# target_link_libraries( wasm_host  ${USE_LIBS} )
 
 
 
