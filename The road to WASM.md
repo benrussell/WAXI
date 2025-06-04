@@ -1,7 +1,27 @@
 A collection of lessons learned on this journey.
 
 
-2025-06-01
+### 2025-06-04
+
+_A couple of hours with the AI can save you from a couple of minutes reading the docs..._
+
+https://github.com/WebAssembly/tool-conventions/blob/main/BasicCABI.md
+
+
+### 2025-06-04
+
+NVG doesn't crash, but it doesn't draw anything either.
+Started by dumping this weird struct address stuff to see what's coming over in
+these 16 bytes. No match.
+So I ignore the AI's "advice" and just use the raw address that's "off by 16 bytes after crossing the WASM ABI".
+Data is a match for the struct contents before WASM sends it over the fence.
+There is NO weird "tail of" struct and sizeof() offset weirdness.
+Structs as params are just sent as ptr's to the struct base address.
+The address may (or may not, I guess) be shifted.
+Weird.
+
+
+### 2025-06-01
 
 Setting up bindings for the nanovg proxy. The host functions need to accept a struct param.
 The binding functions dont accept it and we need a custom binding wrapper. (See LinkHelper.h)
